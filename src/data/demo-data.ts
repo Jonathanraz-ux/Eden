@@ -31,7 +31,7 @@ import type { ServiceWithStats } from '../lib/services/servicesService';
 // ---------------------------------------------------------------------------
 
 export const DEMO_HOTEL_ID = 'demo-hotel-001';
-export const DEMO_WHATSAPP_PHONE = '+2250700000000';
+export const DEMO_WHATSAPP_PHONE = '+261349320184';
 export const DEMO_WHATSAPP_MESSAGE = encodeURIComponent(
   'Bonjour, je viens de tester votre dashboard de démonstration et je souhaite en savoir plus pour mon entreprise.'
 );
