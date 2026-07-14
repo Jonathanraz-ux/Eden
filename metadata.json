@@ -1,0 +1,6 @@
+{
+  "name": "EDEN — Hôtel & Lodge",
+  "description": "Système de gestion haut de gamme pour hôtels, lodges et bungalows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
