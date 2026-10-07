@@ -18,9 +18,9 @@ function formatAxisCents(cents: number): string {
 
 function formatCentsCompact(cents: number): string {
   const value = cents / 100;
-  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M FCFA`;
-  if (value >= 10000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}k FCFA`;
-  return `${value.toLocaleString('fr-FR')} FCFA`;
+  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M Ar`;
+  if (value >= 10000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}k Ar`;
+  return `${value.toLocaleString('fr-FR')} Ar`;
 }
 
 const tabs = [

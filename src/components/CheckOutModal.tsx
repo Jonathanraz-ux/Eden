@@ -66,7 +66,7 @@ export function CheckOutModal({ bookingId, onClose }: CheckOutModalProps) {
           employee_id: null,
           guest_id: null,
           amount_cents: Math.round(Number(paymentAmount) * 100),
-          currency_code: 'EUR',
+          currency_code: 'MGA',
           method: paymentMethod,
           type: 'balance',
           status: 'success',
@@ -131,7 +131,7 @@ export function CheckOutModal({ bookingId, onClose }: CheckOutModalProps) {
             <div className="px-4 py-3 bg-[#FAF9F6] border border-[#1A1A1A]/5 text-center">
               <p className="text-[9px] uppercase tracking-[0.2em] text-[#1A1A1A]/40 mb-1">Solde</p>
               <p className={cn("text-lg font-serif font-bold", hasBalance ? "text-amber-700" : "text-emerald-700")}>
-                {hasBalance ? formatCents(balance) : '0 FCFA'}
+                {hasBalance ? formatCents(balance) : '0 Ar'}
               </p>
             </div>
           </div>
@@ -161,7 +161,7 @@ export function CheckOutModal({ bookingId, onClose }: CheckOutModalProps) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-amber-700/70 mb-2">Montant (FCFA)</label>
+                  <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-amber-700/70 mb-2">Montant (Ar)</label>
                   <input
                     type="number"
                     min="0"

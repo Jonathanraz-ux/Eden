@@ -88,7 +88,7 @@ export function CheckInModal({ bookingId, onClose }: CheckInModalProps) {
           employee_id: null,
           guest_id: null,
           amount_cents: Math.round(Number(depositAmount) * 100),
-          currency_code: 'EUR',
+          currency_code: 'MGA',
           method: 'card',
           type: 'deposit',
           status: 'success',
@@ -255,7 +255,7 @@ export function CheckInModal({ bookingId, onClose }: CheckInModalProps) {
               </label>
               {collectDeposit && (
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (FCFA)</label>
+                  <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (Ar)</label>
                   <input
                     type="number"
                     min="0"
@@ -305,7 +305,7 @@ export function CheckInModal({ bookingId, onClose }: CheckInModalProps) {
                 {collectDeposit && depositAmount && (
                   <div className="flex justify-between text-emerald-700">
                     <span>Acompte</span>
-                    <span className="font-medium">{Number(depositAmount).toLocaleString('fr-FR')} FCFA</span>
+                    <span className="font-medium">{Number(depositAmount).toLocaleString('fr-FR')} Ar</span>
                   </div>
                 )}
               </div>

@@ -13,9 +13,9 @@ type Tab = 'rate_plans' | 'seasons';
 
 const PRICING_MODE_LABELS: Record<string, string> = {
   percentage: '%',
-  fixed_amount: 'FCFA fixe',
+  fixed_amount: 'Ar fixe',
   fixed_price: 'Prix fixe',
-  per_night: 'FCFA/nuit',
+  per_night: 'Ar/nuit',
   weekend_price: 'Week-end',
   event_price: 'Événement',
 };

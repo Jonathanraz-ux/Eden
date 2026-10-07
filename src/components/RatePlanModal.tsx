@@ -147,7 +147,7 @@ export function RatePlanModal({ ratePlan, onClose }: RatePlanModalProps) {
             </label>
             <div className="flex-1" />
             <div className="w-40">
-              <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-1">Acompte requis (FCFA)</label>
+              <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-1">Acompte requis (Ar)</label>
               <input
                 type="number"
                 min="0"
@@ -172,7 +172,7 @@ export function RatePlanModal({ ratePlan, onClose }: RatePlanModalProps) {
                     <div>
                       <p className="text-sm font-medium text-[#1A1A1A]">{rt.name}</p>
                       <p className="text-[9px] uppercase tracking-wider text-[#1A1A1A]/40">
-                        Base : {(rt.base_price_cents / 100).toLocaleString('fr-FR')} FCFA
+                        Base : {(rt.base_price_cents / 100).toLocaleString('fr-FR')} Ar
                       </p>
                     </div>
                     <div className="w-28">
@@ -182,7 +182,7 @@ export function RatePlanModal({ ratePlan, onClose }: RatePlanModalProps) {
                         step="0.01"
                         value={prices[rt.id] ?? ''}
                         onChange={e => setPrices(p => ({ ...p, [rt.id]: e.target.value }))}
-                        placeholder="Prix (FCFA)"
+                        placeholder="Prix (Ar)"
                         className="w-full px-3 py-2 bg-white border border-[#1A1A1A]/10 text-sm text-[#1A1A1A] placeholder:text-[#1A1A1A]/25 focus:outline-none focus:border-[#C5A059]/50 transition-colors text-right"
                       />
                     </div>

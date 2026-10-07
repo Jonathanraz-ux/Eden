@@ -18,9 +18,9 @@ import { useCurrentHotelId } from '../lib/hooks/useAuth';
 
 function formatCents(cents: number): string {
   const value = cents / 100;
-  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M FCFA`;
-  if (value >= 10000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}k FCFA`;
-  return `${value.toLocaleString('fr-FR')} FCFA`;
+  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M Ar`;
+  if (value >= 10000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}k Ar`;
+  return `${value.toLocaleString('fr-FR')} Ar`;
 }
 
 function formatAxisValue(value: number): string {
@@ -323,7 +323,7 @@ export function DashboardView() {
                     }}
                     labelStyle={{ color: '#FAF9F6', opacity: 0.6, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em' }}
                     itemStyle={{ color: '#C5A059', fontWeight: 600, fontSize: '13px' }}
-                    formatter={(value: number) => [`${value.toLocaleString('fr-FR')} FCFA`, 'Revenu']}
+                    formatter={(value: number) => [`${value.toLocaleString('fr-FR')} Ar`, 'Revenu']}
                   />
                   <Area type="monotone" dataKey="revenu" stroke="#C5A059" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenu)" />
                 </AreaChart>

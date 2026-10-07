@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCents(cents: number, currency = 'FCFA'): string {
+export function formatCents(cents: number, currency = 'Ar'): string {
   const value = cents / 100;
   const digits = Math.abs(value) >= 10000 ? 0 : 2;
   return `${value.toLocaleString('fr-FR', { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${currency}`;

@@ -57,7 +57,7 @@ export const demoHotel: Hotel = {
   phone: '+225 27 20 20 30 40',
   email: 'contact@eden-hotel.ci',
   website: 'https://eden-hotel.ci',
-  currency_code: 'XOF',
+  currency_code: 'MGA',
   default_language: 'fr',
   timezone: 'Africa/Abidjan',
   is_active: true,
@@ -67,10 +67,26 @@ export const demoHotel: Hotel = {
 };
 
 // ---------------------------------------------------------------------------
+
+const AMOUNT_SCALE = 3;
+
+function scaleMoney<T>(value: T): T {
+  if (Array.isArray(value)) return value.map(v => scaleMoney(v)) as T;
+  if (value !== null && typeof value === 'object') {
+    const out = {} as Record<string, unknown>;
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = k.endsWith('_cents') && typeof v === 'number' ? v * AMOUNT_SCALE : scaleMoney(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
+// ---------------------------------------------------------------------------
 // Room Types
 // ---------------------------------------------------------------------------
 
-export const demoRoomTypes: RoomType[] = [
+export const demoRoomTypes: RoomType[] = scaleMoney([
   {
     id: 'rt-001', hotel_id: DEMO_HOTEL_ID, name: 'Chambre Classique',
     description: 'Chambre confortable avec vue jardin', base_capacity: 2,
@@ -95,7 +111,7 @@ export const demoRoomTypes: RoomType[] = [
     base_price_cents: 45000000, surface_m2: 95, is_active: true, sort_order: 4,
     created_at: '2023-01-15T08:00:00Z', updated_at: '2023-01-15T08:00:00Z', deleted_at: null,
   },
-];
+]);
 
 // ---------------------------------------------------------------------------
 // Rooms
@@ -206,20 +222,20 @@ function roundTo(amount: number, step = 100000): number {
   return Math.round(amount / step) * step;
 }
 
-const demoCuratedBookings: Booking[] = [
-  { id: 'bk-001', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-001', created_at: dAt(-24, 10), check_in_date: d(-7), check_out_date: d(0), night_count: 7, status: 'checked_in', total_amount_cents: 52500000, paid_amount_cents: 37500000, balance_cents: 15000000, currency_code: 'XOF', source: 'direct', special_requests: 'Chambre calme, étage élevé', internal_notes: null, confirmed_at: dAt(-23, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 14), deleted_at: null },
-  { id: 'bk-002', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-002', created_at: dAt(-16, 14), check_in_date: d(-5), check_out_date: d(0), night_count: 5, status: 'checked_in', total_amount_cents: 55000000, paid_amount_cents: 55000000, balance_cents: 0, currency_code: 'XOF', source: 'booking.com', special_requests: null, internal_notes: 'Client fidèle', confirmed_at: dAt(-15, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-2, 10), deleted_at: null },
-  { id: 'bk-003', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-003', created_at: dAt(-9, 9), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 22500000, paid_amount_cents: 11250000, balance_cents: 11250000, currency_code: 'XOF', source: 'direct', special_requests: 'Arrivée tardive prévue', internal_notes: null, confirmed_at: dAt(-8, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-6, 8), deleted_at: null },
-  { id: 'bk-004', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-004', created_at: dAt(-4, 11), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 54000000, paid_amount_cents: 0, balance_cents: 54000000, currency_code: 'XOF', source: 'agoda', special_requests: null, internal_notes: null, confirmed_at: dAt(-3, 9), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-3, 9), deleted_at: null },
-  { id: 'bk-005', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-005', created_at: dAt(-45, 8), check_in_date: d(-30), check_out_date: d(-27), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-44, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-27, 11), deleted_at: null },
-  { id: 'bk-006', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-006', created_at: dAt(-33, 16), check_in_date: d(-20), check_out_date: d(-17), night_count: 3, status: 'completed', total_amount_cents: 33000000, paid_amount_cents: 33000000, balance_cents: 0, currency_code: 'XOF', source: 'booking.com', special_requests: null, internal_notes: null, confirmed_at: dAt(-32, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-17, 11), deleted_at: null },
-  { id: 'bk-007', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-007', created_at: dAt(-19, 12), check_in_date: d(-10), check_out_date: d(-7), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-18, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-7, 11), deleted_at: null },
-  { id: 'bk-008', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-004', booking_reference: 'EDN-2026-008', created_at: dAt(-12, 9), check_in_date: d(-1), check_out_date: d(5), night_count: 6, status: 'checked_in', total_amount_cents: 270000000, paid_amount_cents: 135000000, balance_cents: 135000000, currency_code: 'XOF', source: 'direct', special_requests: 'Suite Présidentielle - Client VIP', internal_notes: 'Accueil VIP requis', confirmed_at: dAt(-11, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 9), deleted_at: null },
-  { id: 'bk-009', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-009', created_at: dAt(-58, 10), check_in_date: d(-45), check_out_date: d(-42), night_count: 3, status: 'cancelled', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: null, cancelled_at: dAt(-53, 8), cancellation_reason: 'Changement de plan', updated_at: dAt(-53, 8), deleted_at: null },
-  { id: 'bk-010', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-010', created_at: dAt(-2, 8), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 33000000, paid_amount_cents: 16500000, balance_cents: 16500000, currency_code: 'XOF', source: 'expedia', special_requests: null, internal_notes: null, confirmed_at: dAt(-1, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 8), deleted_at: null },
-  { id: 'bk-011', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-011', created_at: dAt(-1, 15), check_in_date: d(10), check_out_date: d(13), night_count: 3, status: 'pending', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 22500000, currency_code: 'XOF', source: 'direct', special_requests: 'Chambre avec vue mer', internal_notes: null, confirmed_at: null, cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 15), deleted_at: null },
-  { id: 'bk-012', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-012', created_at: dAt(-14, 10), check_in_date: d(-7), check_out_date: d(-3), night_count: 4, status: 'checked_out', total_amount_cents: 72000000, paid_amount_cents: 72000000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-13, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-3, 11), deleted_at: null },
-];
+const demoCuratedBookings: Booking[] = scaleMoney([
+  { id: 'bk-001', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-001', created_at: dAt(-24, 10), check_in_date: d(-7), check_out_date: d(0), night_count: 7, status: 'checked_in', total_amount_cents: 52500000, paid_amount_cents: 37500000, balance_cents: 15000000, currency_code: 'MGA', source: 'direct', special_requests: 'Chambre calme, étage élevé', internal_notes: null, confirmed_at: dAt(-23, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 14), deleted_at: null },
+  { id: 'bk-002', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-002', created_at: dAt(-16, 14), check_in_date: d(-5), check_out_date: d(0), night_count: 5, status: 'checked_in', total_amount_cents: 55000000, paid_amount_cents: 55000000, balance_cents: 0, currency_code: 'MGA', source: 'booking.com', special_requests: null, internal_notes: 'Client fidèle', confirmed_at: dAt(-15, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-2, 10), deleted_at: null },
+  { id: 'bk-003', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-003', created_at: dAt(-9, 9), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 22500000, paid_amount_cents: 11250000, balance_cents: 11250000, currency_code: 'MGA', source: 'direct', special_requests: 'Arrivée tardive prévue', internal_notes: null, confirmed_at: dAt(-8, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-6, 8), deleted_at: null },
+  { id: 'bk-004', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-004', created_at: dAt(-4, 11), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 54000000, paid_amount_cents: 0, balance_cents: 54000000, currency_code: 'MGA', source: 'agoda', special_requests: null, internal_notes: null, confirmed_at: dAt(-3, 9), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-3, 9), deleted_at: null },
+  { id: 'bk-005', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-005', created_at: dAt(-45, 8), check_in_date: d(-30), check_out_date: d(-27), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'MGA', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-44, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-27, 11), deleted_at: null },
+  { id: 'bk-006', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-006', created_at: dAt(-33, 16), check_in_date: d(-20), check_out_date: d(-17), night_count: 3, status: 'completed', total_amount_cents: 33000000, paid_amount_cents: 33000000, balance_cents: 0, currency_code: 'MGA', source: 'booking.com', special_requests: null, internal_notes: null, confirmed_at: dAt(-32, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-17, 11), deleted_at: null },
+  { id: 'bk-007', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-007', created_at: dAt(-19, 12), check_in_date: d(-10), check_out_date: d(-7), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'MGA', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-18, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-7, 11), deleted_at: null },
+  { id: 'bk-008', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-004', booking_reference: 'EDN-2026-008', created_at: dAt(-12, 9), check_in_date: d(-1), check_out_date: d(5), night_count: 6, status: 'checked_in', total_amount_cents: 270000000, paid_amount_cents: 135000000, balance_cents: 135000000, currency_code: 'MGA', source: 'direct', special_requests: 'Suite Présidentielle - Client VIP', internal_notes: 'Accueil VIP requis', confirmed_at: dAt(-11, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 9), deleted_at: null },
+  { id: 'bk-009', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-009', created_at: dAt(-58, 10), check_in_date: d(-45), check_out_date: d(-42), night_count: 3, status: 'cancelled', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 0, currency_code: 'MGA', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: null, cancelled_at: dAt(-53, 8), cancellation_reason: 'Changement de plan', updated_at: dAt(-53, 8), deleted_at: null },
+  { id: 'bk-010', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-010', created_at: dAt(-2, 8), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 33000000, paid_amount_cents: 16500000, balance_cents: 16500000, currency_code: 'MGA', source: 'expedia', special_requests: null, internal_notes: null, confirmed_at: dAt(-1, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 8), deleted_at: null },
+  { id: 'bk-011', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-011', created_at: dAt(-1, 15), check_in_date: d(10), check_out_date: d(13), night_count: 3, status: 'pending', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 22500000, currency_code: 'MGA', source: 'direct', special_requests: 'Chambre avec vue mer', internal_notes: null, confirmed_at: null, cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 15), deleted_at: null },
+  { id: 'bk-012', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-012', created_at: dAt(-14, 10), check_in_date: d(-7), check_out_date: d(-3), night_count: 4, status: 'checked_out', total_amount_cents: 72000000, paid_amount_cents: 72000000, balance_cents: 0, currency_code: 'MGA', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-13, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-3, 11), deleted_at: null },
+]);
 
 function makeHistoryBookings(): Booking[] {
   const rnd = prng(20261007);
@@ -285,7 +301,7 @@ function makeHistoryBookings(): Booking[] {
         total_amount_cents: total,
         paid_amount_cents: paid,
         balance_cents: total - paid,
-        currency_code: 'XOF',
+        currency_code: 'MGA',
         source: sources[Math.floor(rnd() * sources.length)],
         special_requests: null,
         internal_notes: null,
@@ -332,20 +348,20 @@ export const demoRooms: Room[] = makeRooms(computeRoomStatuses());
 // Payments
 // ---------------------------------------------------------------------------
 
-const demoCuratedPayments: Payment[] = [
-  { id: 'pay-001', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-001', amount_cents: 30000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-001', notes: null, processed_at: dAt(-24, 10), created_at: dAt(-24, 10), updated_at: dAt(-24, 10) },
-  { id: 'pay-002', booking_id: 'bk-002', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-002', amount_cents: 55000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-002', notes: null, processed_at: dAt(-16, 14), created_at: dAt(-16, 14), updated_at: dAt(-16, 14) },
-  { id: 'pay-003', booking_id: 'bk-003', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-003', amount_cents: 11250000, currency_code: 'XOF', method: 'transfer', type: 'deposit', status: 'success', external_reference: 'PAY-2026-003', notes: 'Virement SIVOCOM', processed_at: dAt(-8, 8), created_at: dAt(-9, 9), updated_at: dAt(-8, 8) },
-  { id: 'pay-004', booking_id: 'bk-005', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-004', amount_cents: 22500000, currency_code: 'XOF', method: 'cash', type: 'balance', status: 'success', external_reference: null, notes: null, processed_at: dAt(-27, 10), created_at: dAt(-27, 10), updated_at: dAt(-27, 10) },
-  { id: 'pay-005', booking_id: 'bk-006', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-005', amount_cents: 33000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-005', notes: 'Booking.com commission included', processed_at: dAt(-33, 16), created_at: dAt(-33, 16), updated_at: dAt(-33, 16) },
-  { id: 'pay-006', booking_id: 'bk-007', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-006', amount_cents: 22500000, currency_code: 'XOF', method: 'mobile_money', type: 'deposit', status: 'success', external_reference: 'MTN-MO-2026-007', notes: 'Orange Money', processed_at: dAt(-18, 8), created_at: dAt(-19, 12), updated_at: dAt(-18, 8) },
-  { id: 'pay-007', booking_id: 'bk-008', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-009', amount_cents: 135000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-007', notes: 'VIP - Suite Présidentielle', processed_at: dAt(-1, 9), created_at: dAt(-1, 9), updated_at: dAt(-1, 9) },
-  { id: 'pay-008', booking_id: 'bk-010', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-007', amount_cents: 16500000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'EXP-2026-008', notes: null, processed_at: dAt(-2, 8), created_at: dAt(-2, 8), updated_at: dAt(-2, 8) },
-  { id: 'pay-009', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-001', amount_cents: 7500000, currency_code: 'XOF', method: 'cash', type: 'supplement', status: 'success', external_reference: null, notes: 'Surcharge minibar', processed_at: dAt(-1, 14), created_at: dAt(-1, 14), updated_at: dAt(-1, 14) },
-  { id: 'pay-010', booking_id: 'bk-012', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-008', amount_cents: 72000000, currency_code: 'XOF', method: 'transfer', type: 'balance', status: 'success', external_reference: 'WAT-TRF-2026-010', notes: 'Paiement intégral', processed_at: dAt(-3, 10), created_at: dAt(-3, 10), updated_at: dAt(-3, 10) },
-  { id: 'pay-011', booking_id: 'bk-009', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-010', amount_cents: 10000000, currency_code: 'XOF', method: 'card', type: 'refund', status: 'refunded', external_reference: 'REF-2026-011', notes: 'Remboursement annulation', processed_at: dAt(-53, 8), created_at: dAt(-53, 8), updated_at: dAt(-53, 8) },
-  { id: 'pay-012', booking_id: 'bk-004', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-011', amount_cents: 27000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'pending', external_reference: 'AGD-2026-012', notes: null, processed_at: null, created_at: dAt(-4, 11), updated_at: dAt(-4, 11) },
-];
+const demoCuratedPayments: Payment[] = scaleMoney([
+  { id: 'pay-001', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-001', amount_cents: 30000000, currency_code: 'MGA', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-001', notes: null, processed_at: dAt(-24, 10), created_at: dAt(-24, 10), updated_at: dAt(-24, 10) },
+  { id: 'pay-002', booking_id: 'bk-002', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-002', amount_cents: 55000000, currency_code: 'MGA', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-002', notes: null, processed_at: dAt(-16, 14), created_at: dAt(-16, 14), updated_at: dAt(-16, 14) },
+  { id: 'pay-003', booking_id: 'bk-003', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-003', amount_cents: 11250000, currency_code: 'MGA', method: 'transfer', type: 'deposit', status: 'success', external_reference: 'PAY-2026-003', notes: 'Virement SIVOCOM', processed_at: dAt(-8, 8), created_at: dAt(-9, 9), updated_at: dAt(-8, 8) },
+  { id: 'pay-004', booking_id: 'bk-005', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-004', amount_cents: 22500000, currency_code: 'MGA', method: 'cash', type: 'balance', status: 'success', external_reference: null, notes: null, processed_at: dAt(-27, 10), created_at: dAt(-27, 10), updated_at: dAt(-27, 10) },
+  { id: 'pay-005', booking_id: 'bk-006', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-005', amount_cents: 33000000, currency_code: 'MGA', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-005', notes: 'Booking.com commission included', processed_at: dAt(-33, 16), created_at: dAt(-33, 16), updated_at: dAt(-33, 16) },
+  { id: 'pay-006', booking_id: 'bk-007', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-006', amount_cents: 22500000, currency_code: 'MGA', method: 'mobile_money', type: 'deposit', status: 'success', external_reference: 'MTN-MO-2026-007', notes: 'Orange Money', processed_at: dAt(-18, 8), created_at: dAt(-19, 12), updated_at: dAt(-18, 8) },
+  { id: 'pay-007', booking_id: 'bk-008', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-009', amount_cents: 135000000, currency_code: 'MGA', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-007', notes: 'VIP - Suite Présidentielle', processed_at: dAt(-1, 9), created_at: dAt(-1, 9), updated_at: dAt(-1, 9) },
+  { id: 'pay-008', booking_id: 'bk-010', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-007', amount_cents: 16500000, currency_code: 'MGA', method: 'card', type: 'deposit', status: 'success', external_reference: 'EXP-2026-008', notes: null, processed_at: dAt(-2, 8), created_at: dAt(-2, 8), updated_at: dAt(-2, 8) },
+  { id: 'pay-009', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-001', amount_cents: 7500000, currency_code: 'MGA', method: 'cash', type: 'supplement', status: 'success', external_reference: null, notes: 'Surcharge minibar', processed_at: dAt(-1, 14), created_at: dAt(-1, 14), updated_at: dAt(-1, 14) },
+  { id: 'pay-010', booking_id: 'bk-012', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-008', amount_cents: 72000000, currency_code: 'MGA', method: 'transfer', type: 'balance', status: 'success', external_reference: 'WAT-TRF-2026-010', notes: 'Paiement intégral', processed_at: dAt(-3, 10), created_at: dAt(-3, 10), updated_at: dAt(-3, 10) },
+  { id: 'pay-011', booking_id: 'bk-009', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-010', amount_cents: 10000000, currency_code: 'MGA', method: 'card', type: 'refund', status: 'refunded', external_reference: 'REF-2026-011', notes: 'Remboursement annulation', processed_at: dAt(-53, 8), created_at: dAt(-53, 8), updated_at: dAt(-53, 8) },
+  { id: 'pay-012', booking_id: 'bk-004', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-011', amount_cents: 27000000, currency_code: 'MGA', method: 'card', type: 'deposit', status: 'pending', external_reference: 'AGD-2026-012', notes: null, processed_at: null, created_at: dAt(-4, 11), updated_at: dAt(-4, 11) },
+]);
 
 function makeHistoryPayments(bookings: Booking[]): Payment[] {
   const rnd = prng(7654321);
@@ -367,7 +383,7 @@ function makeHistoryPayments(bookings: Booking[]): Payment[] {
         employee_id: employeePool[Math.floor(rnd() * employeePool.length)],
         guest_id: null,
         amount_cents: amount,
-        currency_code: 'XOF',
+        currency_code: 'MGA',
         method: methodPool[Math.floor(rnd() * methodPool.length)],
         type,
         status,
@@ -420,12 +436,12 @@ export const demoReviews: Review[] = [
 // Rate Plans
 // ---------------------------------------------------------------------------
 
-export const demoRatePlans: RatePlan[] = [
+export const demoRatePlans: RatePlan[] = scaleMoney([
   { id: 'rp-001', hotel_id: DEMO_HOTEL_ID, name: 'Tarif Standard', description: 'Tarif de base sans flexibilité', cancellation_policy: { free_cancellation_days: 7 }, deposit_required_cents: null, deposit_percentage: 50, is_refundable: false, is_active: true, conditions: 'Annulation gratuite jusqu\'à 7 jours avant l\'arrivée', created_at: '2023-01-15T08:00:00Z', updated_at: '2025-01-01T08:00:00Z', deleted_at: null },
   { id: 'rp-002', hotel_id: DEMO_HOTEL_ID, name: 'Tarif Flexible', description: 'Annulation gratuite jusqu\'à 48h avant', cancellation_policy: { free_cancellation_days: 2 }, deposit_required_cents: null, deposit_percentage: 30, is_refundable: true, is_active: true, conditions: 'Annulation gratuite jusqu\'à 48h avant l\'arrivée', created_at: '2023-01-15T08:00:00Z', updated_at: '2025-06-01T08:00:00Z', deleted_at: null },
   { id: 'rp-003', hotel_id: DEMO_HOTEL_ID, name: 'Pack Séjour', description: 'Inclut petit-déjeuner et transfert', cancellation_policy: { free_cancellation_days: 14 }, deposit_required_cents: 5000000, deposit_percentage: null, is_refundable: false, is_active: true, conditions: 'Petit-déjeuner buffet inclus + transfert aéroport', created_at: '2024-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
   { id: 'rp-004', hotel_id: DEMO_HOTEL_ID, name: 'Tarif VIP', description: 'Accès salon, service en chambre 24h/24', cancellation_policy: { free_cancellation_days: 30 }, deposit_required_cents: 20000000, deposit_percentage: null, is_refundable: true, is_active: true, conditions: 'Accès VIP Lounge, service en chambre 24h, upgrade automatique', created_at: '2024-06-01T08:00:00Z', updated_at: '2026-03-01T08:00:00Z', deleted_at: null },
-];
+]);
 
 // ---------------------------------------------------------------------------
 // Seasons
@@ -434,7 +450,7 @@ export const demoRatePlans: RatePlan[] = [
 export const demoSeasons: Season[] = [
   { id: 's-001', hotel_id: DEMO_HOTEL_ID, name: 'Haute Saison', start_date: '2026-12-15', end_date: '2027-01-15', pricing_mode: 'percentage', value: 25, apply_days: null, priority: 1, is_active: true, created_at: '2026-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z' },
   { id: 's-002', hotel_id: DEMO_HOTEL_ID, name: 'Saison verte', start_date: '2026-06-01', end_date: '2026-09-30', pricing_mode: 'percentage', value: 15, apply_days: [5, 6], priority: 2, is_active: true, created_at: '2026-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z' },
-  { id: 's-003', hotel_id: DEMO_HOTEL_ID, name: 'Fêtes de Fin d\'Année', start_date: '2026-12-25', end_date: '2027-01-05', pricing_mode: 'fixed_amount', value: 15000000, apply_days: null, priority: 0, is_active: true, created_at: '2026-06-01T08:00:00Z', updated_at: '2026-06-01T08:00:00Z' },
+  { id: 's-003', hotel_id: DEMO_HOTEL_ID, name: 'Fêtes de Fin d\'Année', start_date: '2026-12-25', end_date: '2027-01-05', pricing_mode: 'fixed_amount', value: 45000000, apply_days: null, priority: 0, is_active: true, created_at: '2026-06-01T08:00:00Z', updated_at: '2026-06-01T08:00:00Z' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -442,29 +458,29 @@ export const demoSeasons: Season[] = [
 // ---------------------------------------------------------------------------
 
 export const demoInvoices: Invoice[] = [
-  { id: 'inv-001', booking_id: 'bk-005', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-001', issue_date: '2026-05-13', due_date: '2026-05-13', total_amount_cents: 22500000, tax_amount_cents: 4050000, discount_amount_cents: 0, net_amount_cents: 18450000, status: 'paid', notes: null, created_at: '2026-05-13T10:00:00Z', updated_at: '2026-05-13T10:00:00Z' },
-  { id: 'inv-002', booking_id: 'bk-006', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-002', issue_date: '2026-05-23', due_date: '2026-05-23', total_amount_cents: 33000000, tax_amount_cents: 5940000, discount_amount_cents: 0, net_amount_cents: 27060000, status: 'paid', notes: null, created_at: '2026-05-23T10:00:00Z', updated_at: '2026-05-23T10:00:00Z' },
-  { id: 'inv-003', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-003', issue_date: d(-1), due_date: d(6), total_amount_cents: 52500000, tax_amount_cents: 9450000, discount_amount_cents: 2500000, net_amount_cents: 40550000, status: 'issued', notes: 'Remise fidélité 5%', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'inv-004', booking_id: 'bk-012', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-004', issue_date: '2026-07-03', due_date: '2026-07-03', total_amount_cents: 72000000, tax_amount_cents: 12960000, discount_amount_cents: 0, net_amount_cents: 59040000, status: 'paid', notes: null, created_at: '2026-07-03T10:00:00Z', updated_at: '2026-07-03T10:00:00Z' },
-  { id: 'inv-005', booking_id: 'bk-008', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-005', issue_date: d(0), due_date: d(7), total_amount_cents: 270000000, tax_amount_cents: 48600000, discount_amount_cents: 0, net_amount_cents: 221400000, status: 'draft', notes: 'Suite Présidentielle - VIP', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'inv-001', booking_id: 'bk-005', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-001', issue_date: '2026-05-13', due_date: '2026-05-13', total_amount_cents: 67500000, tax_amount_cents: 13500000, discount_amount_cents: 0, net_amount_cents: 54000000, status: 'paid', notes: null, created_at: '2026-05-13T10:00:00Z', updated_at: '2026-05-13T10:00:00Z' },
+  { id: 'inv-002', booking_id: 'bk-006', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-002', issue_date: '2026-05-23', due_date: '2026-05-23', total_amount_cents: 99000000, tax_amount_cents: 19800000, discount_amount_cents: 0, net_amount_cents: 79200000, status: 'paid', notes: null, created_at: '2026-05-23T10:00:00Z', updated_at: '2026-05-23T10:00:00Z' },
+  { id: 'inv-003', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-003', issue_date: d(-1), due_date: d(6), total_amount_cents: 157500000, tax_amount_cents: 31500000, discount_amount_cents: 7500000, net_amount_cents: 118500000, status: 'issued', notes: 'Remise fidélité 5%', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'inv-004', booking_id: 'bk-012', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-004', issue_date: '2026-07-03', due_date: '2026-07-03', total_amount_cents: 216000000, tax_amount_cents: 43200000, discount_amount_cents: 0, net_amount_cents: 172800000, status: 'paid', notes: null, created_at: '2026-07-03T10:00:00Z', updated_at: '2026-07-03T10:00:00Z' },
+  { id: 'inv-005', booking_id: 'bk-008', hotel_id: DEMO_HOTEL_ID, invoice_number: 'FAC-2026-005', issue_date: d(0), due_date: d(7), total_amount_cents: 810000000, tax_amount_cents: 162000000, discount_amount_cents: 0, net_amount_cents: 648000000, status: 'draft', notes: 'Suite Présidentielle - VIP', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // ---------------------------------------------------------------------------
 // Invoice Items
 // ---------------------------------------------------------------------------
 
-export const demoInvoiceItems: InvoiceItem[] = [
-  { id: 'ii-001', invoice_id: 'inv-001', description: 'Chambre Classique - 3 nuits', quantity: 3, unit_price_cents: 7500000, total_price_cents: 22500000, tax_rate: 18, tax_id: 'tax-001', discount_id: null, sort_order: 1, created_at: '2026-05-13T10:00:00Z' },
-  { id: 'ii-002', invoice_id: 'inv-002', description: 'Chambre Supérieure - 3 nuits', quantity: 3, unit_price_cents: 11000000, total_price_cents: 33000000, tax_rate: 18, tax_id: 'tax-001', discount_id: null, sort_order: 1, created_at: '2026-05-23T10:00:00Z' },
-  { id: 'ii-003', invoice_id: 'inv-003', description: 'Chambre Classique - 7 nuits', quantity: 7, unit_price_cents: 7500000, total_price_cents: 52500000, tax_rate: 18, tax_id: 'tax-001', discount_id: 'disc-002', sort_order: 1, created_at: new Date().toISOString() },
-];
+export const demoInvoiceItems: InvoiceItem[] = scaleMoney([
+  { id: 'ii-001', invoice_id: 'inv-001', description: 'Chambre Classique - 3 nuits', quantity: 3, unit_price_cents: 7500000, total_price_cents: 22500000, tax_rate: 20, tax_id: 'tax-001', discount_id: null, sort_order: 1, created_at: '2026-05-13T10:00:00Z' },
+  { id: 'ii-002', invoice_id: 'inv-002', description: 'Chambre Supérieure - 3 nuits', quantity: 3, unit_price_cents: 11000000, total_price_cents: 33000000, tax_rate: 20, tax_id: 'tax-001', discount_id: null, sort_order: 1, created_at: '2026-05-23T10:00:00Z' },
+  { id: 'ii-003', invoice_id: 'inv-003', description: 'Chambre Classique - 7 nuits', quantity: 7, unit_price_cents: 7500000, total_price_cents: 52500000, tax_rate: 20, tax_id: 'tax-001', discount_id: 'disc-002', sort_order: 1, created_at: new Date().toISOString() },
+]);
 
 // ---------------------------------------------------------------------------
 // Taxes
 // ---------------------------------------------------------------------------
 
 export const demoTaxes: Tax[] = [
-  { id: 'tax-001', hotel_id: DEMO_HOTEL_ID, name: 'TVA 18%', rate: 0.18, is_active: true, created_at: '2023-01-15T08:00:00Z' },
+  { id: 'tax-001', hotel_id: DEMO_HOTEL_ID, name: 'TVA 20%', rate: 0.2, is_active: true, created_at: '2023-01-15T08:00:00Z' },
   { id: 'tax-002', hotel_id: DEMO_HOTEL_ID, name: 'Taxe de séjour', rate: 0.02, is_active: true, created_at: '2023-01-15T08:00:00Z' },
   { id: 'tax-003', hotel_id: DEMO_HOTEL_ID, name: 'Taxe communale', rate: 0.01, is_active: false, created_at: '2023-06-01T08:00:00Z' },
 ];
@@ -476,25 +492,25 @@ export const demoTaxes: Tax[] = [
 export const demoDiscounts: Discount[] = [
   { id: 'disc-001', hotel_id: DEMO_HOTEL_ID, name: 'Early Bird', type: 'percentage', value: 10, code: 'EARLY10', is_active: true, valid_from: '2026-01-01', valid_until: '2026-12-31', created_at: '2026-01-01T08:00:00Z' },
   { id: 'disc-002', hotel_id: DEMO_HOTEL_ID, name: 'Remise Fidélité', type: 'percentage', value: 5, code: null, is_active: true, valid_from: null, valid_until: null, created_at: '2024-06-01T08:00:00Z' },
-  { id: 'disc-003', hotel_id: DEMO_HOTEL_ID, name: 'Offre Séjour Long', type: 'fixed_amount', value: 5000000, code: 'SEJOUR5', is_active: true, valid_from: '2026-06-01', valid_until: '2026-09-30', created_at: '2026-06-01T08:00:00Z' },
+  { id: 'disc-003', hotel_id: DEMO_HOTEL_ID, name: 'Offre Séjour Long', type: 'fixed_amount', value: 15000000, code: 'SEJOUR5', is_active: true, valid_from: '2026-06-01', valid_until: '2026-09-30', created_at: '2026-06-01T08:00:00Z' },
 ];
 
 // ---------------------------------------------------------------------------
 // Services
 // ---------------------------------------------------------------------------
 
-export const demoServices: Service[] = [
-  { id: 'svc-001', hotel_id: DEMO_HOTEL_ID, name: 'Spa & Well-being', translations: { en: 'Spa & Well-being' }, description: 'Massage, soins du corps, hammam', unit_price_cents: 2500000, pricing_type: 'per_person', icon: 'Sparkles', category: 'wellness', tax_rate: 18, is_active: true, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
-  { id: 'svc-002', hotel_id: DEMO_HOTEL_ID, name: 'Transfert Aéroport', translations: { en: 'Airport Transfer' }, description: 'Navette aller/retour depuis l\'aéroport Felix Houphouet-Boigny', unit_price_cents: 1500000, pricing_type: 'per_room', icon: 'Car', category: 'transport', tax_rate: 18, is_active: true, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
-  { id: 'svc-003', hotel_id: DEMO_HOTEL_ID, name: 'Petit-déjeuner en chambre', translations: { en: 'In-room Breakfast' }, description: 'Service de petit-déjeuner en chambre 7h-10h', unit_price_cents: 800000, pricing_type: 'per_person', icon: 'Coffee', category: 'dining', tax_rate: 18, is_active: true, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
-  { id: 'svc-004', hotel_id: DEMO_HOTEL_ID, name: 'Service de blanchisserie', translations: { en: 'Laundry Service' }, description: 'Lavage et repassage express', unit_price_cents: 500000, pricing_type: 'per_room', icon: 'Shirt', category: 'amenities', tax_rate: 18, is_active: true, created_at: '2023-06-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
-  { id: 'svc-005', hotel_id: DEMO_HOTEL_ID, name: 'Location de véhicule', translations: { en: 'Car Rental' }, description: 'Location de véhicules avec ou sans chauffeur', unit_price_cents: 15000000, pricing_type: 'flat', icon: 'Car', category: 'transport', tax_rate: 18, is_active: true, created_at: '2024-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
-];
+export const demoServices: Service[] = scaleMoney([
+  { id: 'svc-001', hotel_id: DEMO_HOTEL_ID, name: 'Spa & Well-being', translations: { en: 'Spa & Well-being' }, description: 'Massage, soins du corps, hammam', unit_price_cents: 2500000, pricing_type: 'per_person', icon: 'Sparkles', category: 'wellness', tax_rate: 20, is_active: true, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
+  { id: 'svc-002', hotel_id: DEMO_HOTEL_ID, name: 'Transfert Aéroport', translations: { en: 'Airport Transfer' }, description: 'Navette aller/retour depuis l\'aéroport Felix Houphouet-Boigny', unit_price_cents: 1500000, pricing_type: 'per_room', icon: 'Car', category: 'transport', tax_rate: 20, is_active: true, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
+  { id: 'svc-003', hotel_id: DEMO_HOTEL_ID, name: 'Petit-déjeuner en chambre', translations: { en: 'In-room Breakfast' }, description: 'Service de petit-déjeuner en chambre 7h-10h', unit_price_cents: 800000, pricing_type: 'per_person', icon: 'Coffee', category: 'dining', tax_rate: 20, is_active: true, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
+  { id: 'svc-004', hotel_id: DEMO_HOTEL_ID, name: 'Service de blanchisserie', translations: { en: 'Laundry Service' }, description: 'Lavage et repassage express', unit_price_cents: 500000, pricing_type: 'per_room', icon: 'Shirt', category: 'amenities', tax_rate: 20, is_active: true, created_at: '2023-06-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
+  { id: 'svc-005', hotel_id: DEMO_HOTEL_ID, name: 'Location de véhicule', translations: { en: 'Car Rental' }, description: 'Location de véhicules avec ou sans chauffeur', unit_price_cents: 15000000, pricing_type: 'flat', icon: 'Car', category: 'transport', tax_rate: 20, is_active: true, created_at: '2024-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
+]);
 
 export const demoServicesWithStats: ServiceWithStats[] = demoServices.map((s, i) => ({
   ...s,
   active_bookings: [12, 8, 15, 6, 3][i],
-  revenue_cents: [9500000, 4500000, 6400000, 2000000, 15000000][i],
+  revenue_cents: [28500000, 13500000, 19200000, 6000000, 45000000][i],
 }));
 
 // ---------------------------------------------------------------------------
@@ -509,7 +525,7 @@ export const demoRestaurantTables: RestaurantTable[] = [
   { id: 'rtbl-005', hotel_id: DEMO_HOTEL_ID, name: 'Table VIP', capacity: 10, location: 'Salon privé', is_active: true, created_at: '2024-06-01T08:00:00Z', updated_at: '2024-06-01T08:00:00Z', deleted_at: null },
 ];
 
-export const demoRestaurantMenuItems: RestaurantMenuItem[] = [
+export const demoRestaurantMenuItems: RestaurantMenuItem[] = scaleMoney([
   { id: 'rmi-001', hotel_id: DEMO_HOTEL_ID, name: 'Poulet Yassa', description: 'Poulet mariné aux oignons citronnés, riz basmati', price_cents: 4500000, category: 'Plats principaux', is_available: true, sort_order: 1, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
   { id: 'rmi-002', hotel_id: DEMO_HOTEL_ID, name: 'Poisson Braisé', description: 'Poisson entier braisé, sauce tomate épicée, ignames frites', price_cents: 5500000, category: 'Plats principaux', is_available: true, sort_order: 2, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
   { id: 'rmi-003', hotel_id: DEMO_HOTEL_ID, name: 'Salade César', description: 'Laitue romaine, parmesan, croûtons, sauce César', price_cents: 2500000, category: 'Entrées', is_available: true, sort_order: 3, created_at: '2023-01-15T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
@@ -518,13 +534,13 @@ export const demoRestaurantMenuItems: RestaurantMenuItem[] = [
   { id: 'rmi-006', hotel_id: DEMO_HOTEL_ID, name: 'Thiéboudienne', description: 'Riz au poisson, sauce tomate, légumes', price_cents: 5000000, category: 'Plats principaux', is_available: true, sort_order: 6, created_at: '2023-06-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
   { id: 'rmi-007', hotel_id: DEMO_HOTEL_ID, name: 'Champagne Brut', description: 'Bouteille de Champagne Moët & Chandon', price_cents: 25000000, category: 'Boissons', is_available: true, sort_order: 7, created_at: '2024-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
   { id: 'rmi-008', hotel_id: DEMO_HOTEL_ID, name: 'Brochettes de Bœuf', description: 'Brochettes marinées, légumes grillés, sauce arachide', price_cents: 4000000, category: 'Plats principaux', is_available: true, sort_order: 8, created_at: '2024-06-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
-];
+]);
 
-export const demoRestaurantOrders: RestaurantOrder[] = [
+export const demoRestaurantOrders: RestaurantOrder[] = scaleMoney([
   { id: 'ro-001', hotel_id: DEMO_HOTEL_ID, table_id: 'rtbl-002', order_reference: 'CMD-001', status: 'served', type: 'dine_in', room_number: null, special_requests: 'Sans arachide', total_amount_cents: 9800000, created_at: new Date(Date.now() - 3600000).toISOString(), updated_at: new Date(Date.now() - 1800000).toISOString() },
   { id: 'ro-002', hotel_id: DEMO_HOTEL_ID, table_id: null, order_reference: 'CMD-002', status: 'preparing', type: 'room_service', room_number: '201', special_requests: null, total_amount_cents: 7000000, created_at: new Date(Date.now() - 900000).toISOString(), updated_at: new Date(Date.now() - 600000).toISOString() },
   { id: 'ro-003', hotel_id: DEMO_HOTEL_ID, table_id: 'rtbl-004', order_reference: 'CMD-003', status: 'pending', type: 'dine_in', room_number: null, special_requests: 'Anniversaire - gâteau souhaité', total_amount_cents: 35000000, created_at: new Date(Date.now() - 300000).toISOString(), updated_at: new Date(Date.now() - 300000).toISOString() },
-];
+]);
 
 // ---------------------------------------------------------------------------
 // Gallery
@@ -659,7 +675,7 @@ export const demoOperationsSummary: OperationsSummary = {
   tasks: [
     { id: 'task-001', type: 'check_in', title: 'Arrivée EDN-2026-003', subtitle: 'Chambre 303 — Aujourd\'hui 14h', priority: 'high', href: '/bookings', booking_id: 'bk-003', room_number: '303' },
     { id: 'task-002', type: 'cleaning', title: 'Nettoyage Chambre 402', subtitle: 'Check-out effectué', priority: 'high', href: '/housekeeping', room_number: '402' },
-    { id: 'task-003', type: 'payment_pending', title: 'Paiement en attente', subtitle: 'EDN-2026-004 — 270 000 FCFA', priority: 'high', href: '/payments', booking_id: 'bk-004' },
+    { id: 'task-003', type: 'payment_pending', title: 'Paiement en attente', subtitle: 'EDN-2026-004 — 810 000 Ar', priority: 'high', href: '/payments', booking_id: 'bk-004' },
     { id: 'task-004', type: 'maintenance', title: 'Maintenance Climatisation', subtitle: 'Chambre 401 — Rapporté par Adjoua', priority: 'medium', href: '/housekeeping', room_number: '401' },
     { id: 'task-005', type: 'room_unassigned', title: 'Chambre non assignée', subtitle: 'Réservation EDN-2026-011', priority: 'medium', href: '/bookings', booking_id: 'bk-011' },
   ],

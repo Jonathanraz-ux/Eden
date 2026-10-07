@@ -75,6 +75,7 @@ export function SettingsView() {
               <div>
                 <label className="block text-[10px] uppercase tracking-widest font-bold mb-3">Devise</label>
                 <select className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#1A1A1A]/10 rounded-sm text-sm focus:outline-none focus:border-[#C5A059] transition-colors appearance-none">
+                  <option>Ar (MGA)</option>
                   <option>EUR (€)</option>
                   <option>USD ($)</option>
                 </select>

@@ -84,7 +84,7 @@ export function PaymentsView() {
         <div>
           <h1 className="text-2xl font-serif text-[#1A1A1A]">Finances</h1>
           <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/30 mt-1.5 font-medium">
-            {loadingPayments ? 'Chargement...' : `${(totalCollected / 100).toLocaleString('fr-FR')} FCFA encaissés`}
+            {loadingPayments ? 'Chargement...' : `${(totalCollected / 100).toLocaleString('fr-FR')} Ar encaissés`}
           </p>
         </div>
         <div className="flex gap-3">

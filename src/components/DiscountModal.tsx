@@ -13,7 +13,7 @@ interface DiscountModalProps {
 
 const typeOptions = [
   { value: 'percentage', label: 'Pourcentage (%)' },
-  { value: 'fixed_amount', label: 'Montant fixe (FCFA)' },
+  { value: 'fixed_amount', label: 'Montant fixe (Ar)' },
 ];
 
 export function DiscountModal({ discount, onClose }: DiscountModalProps) {
