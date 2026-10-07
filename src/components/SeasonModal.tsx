@@ -18,9 +18,9 @@ const DAYS = [
 
 const PRICING_MODES: { value: Season['pricing_mode']; label: string }[] = [
   { value: 'percentage', label: 'Pourcentage (%)' },
-  { value: 'fixed_amount', label: 'Montant fixe (€)' },
-  { value: 'fixed_price', label: 'Prix fixe (€)' },
-  { value: 'per_night', label: 'Par nuit (€)' },
+  { value: 'fixed_amount', label: 'Montant fixe (FCFA)' },
+  { value: 'fixed_price', label: 'Prix fixe (FCFA)' },
+  { value: 'per_night', label: 'Par nuit (FCFA)' },
   { value: 'weekend_price', label: 'Prix week-end' },
   { value: 'event_price', label: 'Prix événement' },
 ];

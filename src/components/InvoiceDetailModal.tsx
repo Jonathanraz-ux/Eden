@@ -204,7 +204,7 @@ export function InvoiceDetailModal({ invoice, onClose }: InvoiceDetailModalProps
                   <input type="number" min="1" value={newQty} onChange={e => setNewQty(e.target.value)} className="w-full px-3 py-2 bg-white border border-[#1A1A1A]/10 text-xs text-center focus:outline-none focus:border-[#C5A059]/50" />
                 </div>
                 <div className="w-28">
-                  <label className="block text-[8px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/40 mb-1">Prix (c€)</label>
+                  <label className="block text-[8px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/40 mb-1">Prix (centimes)</label>
                   <input type="number" min="0" value={newPrice} onChange={e => setNewPrice(e.target.value)} placeholder="0" className="w-full px-3 py-2 bg-white border border-[#1A1A1A]/10 text-xs text-right focus:outline-none focus:border-[#C5A059]/50" />
                 </div>
                 <button onClick={handleAddItem} disabled={!newDesc.trim() || !newPrice} className="p-2.5 bg-[#1A1A1A] text-white hover:bg-[#333] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">

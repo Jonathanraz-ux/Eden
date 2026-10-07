@@ -1,11 +1,27 @@
 import { useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend } from 'recharts';
-import { TrendingUp, TrendingDown, CalendarDays, BedDouble, CreditCard, XCircle, Clock, Users, Loader2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, CalendarDays, BedDouble, CreditCard, XCircle, Clock, Users, Loader2, Banknote, Star } from 'lucide-react';
 import { cn, formatCents } from '../lib/utils';
 import { useCurrentHotelId } from '../lib/hooks/useAuth';
 import { useRevenueByMonth, useRevenueByDay, usePaymentMethodBreakdown, useOccupancyByRoomType, useBookingStatusDistribution, useCancellationRate, useTotalRevenue, useAvgStayDuration } from '../lib/hooks/useAnalytics';
+import { useBookings } from '../lib/hooks/useBookings';
+import { useReviews } from '../lib/hooks/useReviews';
 import { BOOKING_STATUS_LABELS } from '../lib/constants';
 import { Skeleton } from '../components/Skeleton';
+
+function formatAxisCents(cents: number): string {
+  const value = cents / 100;
+  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}M`;
+  if (value >= 1000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 0 })}k`;
+  return value.toLocaleString('fr-FR');
+}
+
+function formatCentsCompact(cents: number): string {
+  const value = cents / 100;
+  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M FCFA`;
+  if (value >= 10000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}k FCFA`;
+  return `${value.toLocaleString('fr-FR')} FCFA`;
+}
 
 const tabs = [
   { key: 'overview', label: 'Aperçu' },
@@ -65,6 +81,8 @@ export function AnalyticsView() {
   const { data: cancellationRate, isLoading: loadingCancellation } = useCancellationRate(hotelId ?? '');
   const { data: totalRevenue, isLoading: loadingTotalRev } = useTotalRevenue(hotelId ?? '');
   const { data: avgStay, isLoading: loadingAvgStay } = useAvgStayDuration(hotelId ?? '');
+  const { data: bookings } = useBookings(hotelId ?? '');
+  const { data: reviews, isLoading: loadingReviews } = useReviews(hotelId ?? '');
 
   const revenueData = revenueDays === 30 ? revenueDaily : revenueMonthly;
 
@@ -82,6 +100,25 @@ export function AnalyticsView() {
     bookingStatusDist?.reduce((s, b) => s + b.count, 0) ?? 0,
     [bookingStatusDist]
   );
+
+  const adr = useMemo(() => {
+    if (!bookings) return null;
+    const valid = bookings.filter(b => !['cancelled', 'no_show', 'expired'].includes(b.status));
+    const nights = valid.reduce((s, b) => s + (b.night_count || 0), 0);
+    const revenue = valid.reduce((s, b) => s + b.total_amount_cents, 0);
+    return nights > 0 ? revenue / nights : null;
+  }, [bookings]);
+
+  const revpar = useMemo(() => {
+    if (!revenueDaily || !totalRooms) return null;
+    const revenue = revenueDaily.reduce((s, r) => s + r.revenue_cents, 0);
+    return revenue / (totalRooms * 30);
+  }, [revenueDaily, totalRooms]);
+
+  const avgRating = useMemo(() => {
+    if (!reviews || reviews.length === 0) return null;
+    return Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10;
+  }, [reviews]);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -109,10 +146,14 @@ export function AnalyticsView() {
       {tab === 'overview' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard icon={CreditCard} label="Revenu total" value={formatCents(totalRevenue ?? 0)} loading={loadingTotalRev} />
-            <StatCard icon={CalendarDays} label="Réservations" value={String(totalBookingCount)} loading={loadingStatusDist} />
+            <StatCard icon={CreditCard} label="Revenu total" value={formatCentsCompact(totalRevenue ?? 0)} loading={loadingTotalRev} />
+            <StatCard icon={CalendarDays} label="Réservations" value={totalBookingCount.toLocaleString('fr-FR')} loading={loadingStatusDist} />
             <StatCard icon={BedDouble} label="Taux d'occupation" value={`${overallOccupancy}%`} loading={loadingOccupancy} />
             <StatCard icon={XCircle} label="Taux d'annulation" value={`${cancellationRate ?? 0}%`} loading={loadingCancellation} />
+            <StatCard icon={Banknote} label="ADR (prix moyen / nuit)" value={adr !== null ? formatCents(Math.round(adr)) : '—'} loading={!bookings} />
+            <StatCard icon={TrendingUp} label="RevPAR (30 jours)" value={revpar !== null ? formatCents(Math.round(revpar)) : '—'} loading={loadingDaily || !totalRooms} />
+            <StatCard icon={Clock} label="Séjour moyen" value={avgStay ? `${avgStay} jours` : '—'} loading={loadingAvgStay} />
+            <StatCard icon={Star} label="Note moyenne" value={avgRating !== null ? `${avgRating} / 5` : '—'} loading={loadingReviews} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -128,7 +169,7 @@ export function AnalyticsView() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1A1A1A" strokeOpacity={0.06} />
                     <XAxis dataKey="period" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 100000).toFixed(0)}k`} />
+                    <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(v) => formatAxisCents(v)} />
                     <Tooltip formatter={(v: number) => formatCents(v)} contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 0, fontSize: 12 }} />
                     <Area type="monotone" dataKey="revenue_cents" stroke="#C5A059" strokeWidth={2} fill="url(#revGrad)" />
                   </AreaChart>
@@ -224,7 +265,7 @@ export function AnalyticsView() {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1A1A1A" strokeOpacity={0.06} />
                   <XAxis dataKey="period" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                  <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(v) => formatAxisCents(v)} />
                   <Tooltip formatter={(v: number) => formatCents(v)} contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 0, fontSize: 12 }} />
                   <Area type="monotone" dataKey="revenue_cents" stroke="#C5A059" strokeWidth={2} fill="url(#revGrad2)" />
                 </AreaChart>
@@ -256,8 +297,8 @@ export function AnalyticsView() {
                 <div className="flex items-center justify-center h-64"><Loader2 className="w-5 h-5 animate-spin text-[#C5A059]" /></div>
               ) : (
                 <div className="space-y-4">
-                  {paymentMethods
-                    ?.sort((a, b) => b.total_cents - a.total_cents)
+                  {[...(paymentMethods ?? [])]
+                    .sort((a, b) => b.total_cents - a.total_cents)
                     .map((m) => {
                       const total = paymentMethods.reduce((s, x) => s + x.total_cents, 0);
                       const pct = total > 0 ? Math.round((m.total_cents / total) * 100) : 0;

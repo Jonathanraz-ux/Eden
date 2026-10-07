@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService, type RevenueByPeriod, type PaymentMethodBreakdown, type OccupancyByRoomType, type BookingStatusDistribution } from '../services/analyticsService';
 import { useDemoMode } from '../demo-mode';
-import { demoRevenueByMonth, demoRevenueByDay, demoPaymentMethods, demoOccupancyByRoomType, demoBookingStatusDist } from '../../data/demo-data';
+import { demoRevenueByMonth, demoRevenueByDay, demoPaymentMethods, demoOccupancyByRoomType, demoBookingStatusDist, demoCancellationRate, demoTotalRevenue, demoAvgStay } from '../../data/demo-data';
 
 export function useRevenueByMonth(hotelId: string, months = 12) {
   const { demoMode } = useDemoMode();
@@ -52,7 +52,7 @@ export function useCancellationRate(hotelId: string) {
   const { demoMode } = useDemoMode();
   return useQuery({
     queryKey: ['analytics', 'cancellation_rate', hotelId],
-    queryFn: (): Promise<number> => demoMode ? Promise.resolve(8.5) : analyticsService.cancellationRate(hotelId),
+    queryFn: (): Promise<number> => demoMode ? Promise.resolve(demoCancellationRate) : analyticsService.cancellationRate(hotelId),
     enabled: Boolean(hotelId),
   });
 }
@@ -61,7 +61,7 @@ export function useTotalRevenue(hotelId: string) {
   const { demoMode } = useDemoMode();
   return useQuery({
     queryKey: ['analytics', 'total_revenue', hotelId],
-    queryFn: (): Promise<number> => demoMode ? Promise.resolve(214700000) : analyticsService.totalRevenue(hotelId),
+    queryFn: (): Promise<number> => demoMode ? Promise.resolve(demoTotalRevenue) : analyticsService.totalRevenue(hotelId),
     enabled: Boolean(hotelId),
   });
 }
@@ -70,7 +70,7 @@ export function useAvgStayDuration(hotelId: string) {
   const { demoMode } = useDemoMode();
   return useQuery({
     queryKey: ['analytics', 'avg_stay', hotelId],
-    queryFn: (): Promise<number> => demoMode ? Promise.resolve(3.8) : analyticsService.avgStayDuration(hotelId),
+    queryFn: (): Promise<number> => demoMode ? Promise.resolve(demoAvgStay) : analyticsService.avgStayDuration(hotelId),
     enabled: Boolean(hotelId),
   });
 }

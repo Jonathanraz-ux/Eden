@@ -134,7 +134,7 @@ export function RoomFormModal({ open, onClose, onSuccess }: RoomFormModalProps) 
                 </option>
                 {roomTypes?.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.name} — {t.base_price_cents / 100}€/nuit
+                    {t.name} — {t.base_price_cents / 100} FCFA/nuit
                   </option>
                 ))}
               </select>
@@ -172,7 +172,7 @@ export function RoomFormModal({ open, onClose, onSuccess }: RoomFormModalProps) 
             </div>
             <div>
               <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">
-                Ajustement Prix (€/nuit)
+                Ajustement Prix (FCFA/nuit)
               </label>
               <input
                 type="number"

@@ -166,7 +166,7 @@ export const operationsService = {
       tasks.push({
         id: `payment-${p.id}`,
         type: 'payment_pending',
-        title: `${(p.amount_cents / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`,
+        title: `${(p.amount_cents / 100).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} FCFA`,
         subtitle: `Paiement en attente · ${p.method ?? '—'}`,
         priority: 'medium',
         href: `/payments`,

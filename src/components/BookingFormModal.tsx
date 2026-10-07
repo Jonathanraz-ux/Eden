@@ -326,7 +326,7 @@ export function BookingFormModal({ open, onClose, onSuccess }: BookingFormModalP
               <input type="number" min="0" {...register('child_count')} className="w-full px-4 py-2.5 bg-[#FAF9F6] border border-[#1A1A1A]/10 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#C5A059]/50 transition-colors" />
             </div>
             <div>
-              <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (€)</label>
+              <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (FCFA)</label>
               <input
                 type="number"
                 min="0"

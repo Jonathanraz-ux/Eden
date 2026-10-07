@@ -93,7 +93,7 @@ export function PaymentFormModal({ open, onClose, preselectedBookingId }: Paymen
                 <option value="">Sélectionner une réservation</option>
                 {bookings?.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.booking_reference} — {(b.total_amount_cents / 100).toFixed(2)}€
+                    {b.booking_reference} — {(b.total_amount_cents / 100).toLocaleString('fr-FR')} FCFA
                   </option>
                 ))}
               </select>
@@ -104,12 +104,12 @@ export function PaymentFormModal({ open, onClose, preselectedBookingId }: Paymen
           {matchingBooking && (
             <div className="px-4 py-3 bg-[#FAF9F6] border border-[#1A1A1A]/5 text-xs text-[#1A1A1A]/60">
               <p>Réservation : <strong className="text-[#1A1A1A]">{matchingBooking.booking_reference}</strong></p>
-              <p>Total : {(matchingBooking.total_amount_cents / 100).toFixed(2)} € · Solde : {(matchingBooking.balance_cents / 100).toFixed(2)} €</p>
+              <p>Total : {(matchingBooking.total_amount_cents / 100).toLocaleString('fr-FR')} FCFA · Solde : {(matchingBooking.balance_cents / 100).toLocaleString('fr-FR')} FCFA</p>
             </div>
           )}
 
           <div>
-            <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (€)</label>
+            <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (FCFA)</label>
             <input type="number" min="0" step="0.01" {...register('amount_euros')} placeholder="0.00" className="w-full px-4 py-2.5 bg-[#FAF9F6] border border-[#1A1A1A]/10 text-sm text-[#1A1A1A] placeholder:text-[#1A1A1A]/25 focus:outline-none focus:border-[#C5A059]/50 transition-colors" />
             {errors.amount_euros && <p className="mt-1 text-[10px] text-red-500">{errors.amount_euros.message as any}</p>}
           </div>

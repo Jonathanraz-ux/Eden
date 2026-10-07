@@ -255,7 +255,7 @@ export function CheckInModal({ bookingId, onClose }: CheckInModalProps) {
               </label>
               {collectDeposit && (
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (€)</label>
+                  <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-[#1A1A1A]/50 mb-2">Montant (FCFA)</label>
                   <input
                     type="number"
                     min="0"
@@ -305,7 +305,7 @@ export function CheckInModal({ bookingId, onClose }: CheckInModalProps) {
                 {collectDeposit && depositAmount && (
                   <div className="flex justify-between text-emerald-700">
                     <span>Acompte</span>
-                    <span className="font-medium">{Number(depositAmount).toFixed(2)} €</span>
+                    <span className="font-medium">{Number(depositAmount).toLocaleString('fr-FR')} FCFA</span>
                   </div>
                 )}
               </div>

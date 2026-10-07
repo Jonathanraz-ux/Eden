@@ -21,6 +21,9 @@ import type {
   Notification,
   RoomStatus,
   BookingStatus,
+  PaymentMethod,
+  PaymentType,
+  PaymentStatus,
 } from '../lib/types/database';
 import type { RevenueByPeriod, PaymentMethodBreakdown, OccupancyByRoomType, BookingStatusDistribution } from '../lib/services/analyticsService';
 import type { OperationsSummary, OperationTask } from '../lib/services/operationsService';
@@ -98,15 +101,7 @@ export const demoRoomTypes: RoomType[] = [
 // Rooms
 // ---------------------------------------------------------------------------
 
-function makeRooms(): Room[] {
-  const statuses: RoomStatus[] = [
-    'available', 'available', 'available', 'available', 'available',
-    'occupied', 'occupied', 'occupied', 'occupied', 'occupied',
-    'occupied', 'occupied', 'occupied', 'reserved', 'reserved',
-    'reserved', 'cleaning', 'cleaning', 'maintenance', 'available',
-    'available', 'occupied', 'available', 'available',
-  ];
-
+function makeRooms(statuses: RoomStatus[]): Room[] {
   const names = [
     '101', '102', '103', '104', '105',
     '201', '202', '203', '204', '205',
@@ -133,8 +128,6 @@ function makeRooms(): Room[] {
     deleted_at: null,
   }));
 }
-
-export const demoRooms: Room[] = makeRooms();
 
 // ---------------------------------------------------------------------------
 // Guests
@@ -180,54 +173,248 @@ function d(daysOffset: number): string {
   return date.toISOString().split('T')[0];
 }
 
-export const demoBookings: Booking[] = [
-  { id: 'bk-001', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-001', created_at: '2026-06-15T10:00:00Z', check_in_date: d(-5), check_out_date: d(2), night_count: 7, status: 'checked_in', total_amount_cents: 52500000, paid_amount_cents: 30000000, balance_cents: 22500000, currency_code: 'XOF', source: 'direct', special_requests: 'Chambre calme, étage élevé', internal_notes: null, confirmed_at: '2026-06-16T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-06-28T14:00:00Z', deleted_at: null },
-  { id: 'bk-002', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-002', created_at: '2026-06-20T14:30:00Z', check_in_date: d(-2), check_out_date: d(3), night_count: 5, status: 'checked_in', total_amount_cents: 55000000, paid_amount_cents: 55000000, balance_cents: 0, currency_code: 'XOF', source: 'booking.com', special_requests: null, internal_notes: 'Client fidèle', confirmed_at: '2026-06-21T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-02T10:00:00Z', deleted_at: null },
-  { id: 'bk-003', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-003', created_at: '2026-06-25T09:00:00Z', check_in_date: d(1), check_out_date: d(4), night_count: 3, status: 'confirmed', total_amount_cents: 22500000, paid_amount_cents: 11250000, balance_cents: 11250000, currency_code: 'XOF', source: 'direct', special_requests: 'Arrivée tardive prévue', internal_notes: null, confirmed_at: '2026-06-26T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-01T08:00:00Z', deleted_at: null },
-  { id: 'bk-004', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-004', created_at: '2026-07-01T11:00:00Z', check_in_date: d(5), check_out_date: d(8), night_count: 3, status: 'pending', total_amount_cents: 54000000, paid_amount_cents: 0, balance_cents: 54000000, currency_code: 'XOF', source: 'agoda', special_requests: null, internal_notes: null, confirmed_at: null, cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-01T11:00:00Z', deleted_at: null },
-  { id: 'bk-005', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-005', created_at: '2026-05-10T08:00:00Z', check_in_date: d(-30), check_out_date: d(-27), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: '2026-05-11T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-05-13T11:00:00Z', deleted_at: null },
-  { id: 'bk-006', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-006', created_at: '2026-05-20T16:00:00Z', check_in_date: d(-20), check_out_date: d(-17), night_count: 3, status: 'completed', total_amount_cents: 33000000, paid_amount_cents: 33000000, balance_cents: 0, currency_code: 'XOF', source: 'booking.com', special_requests: null, internal_notes: null, confirmed_at: '2026-05-21T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-05-23T11:00:00Z', deleted_at: null },
-  { id: 'bk-007', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-007', created_at: '2026-06-01T12:00:00Z', check_in_date: d(-10), check_out_date: d(-7), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: '2026-06-02T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-06-04T11:00:00Z', deleted_at: null },
-  { id: 'bk-008', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-004', booking_reference: 'EDN-2026-008', created_at: '2026-06-28T09:30:00Z', check_in_date: d(-1), check_out_date: d(5), night_count: 6, status: 'checked_in', total_amount_cents: 270000000, paid_amount_cents: 135000000, balance_cents: 135000000, currency_code: 'XOF', source: 'direct', special_requests: 'Suite Présidentielle - Client VIP', internal_notes: 'Accueil VIP requis', confirmed_at: '2026-06-29T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-03T14:00:00Z', deleted_at: null },
-  { id: 'bk-009', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-009', created_at: '2026-04-15T10:00:00Z', check_in_date: d(-45), check_out_date: d(-42), night_count: 3, status: 'cancelled', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: null, cancelled_at: '2026-04-20T08:00:00Z', cancellation_reason: 'Changement de plan', updated_at: '2026-04-20T08:00:00Z', deleted_at: null },
-  { id: 'bk-010', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-010', created_at: '2026-07-03T08:00:00Z', check_in_date: d(7), check_out_date: d(10), night_count: 3, status: 'confirmed', total_amount_cents: 33000000, paid_amount_cents: 16500000, balance_cents: 16500000, currency_code: 'XOF', source: 'expedia', special_requests: null, internal_notes: null, confirmed_at: '2026-07-04T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-04T08:00:00Z', deleted_at: null },
-  { id: 'bk-011', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-011', created_at: '2026-07-05T15:00:00Z', check_in_date: d(10), check_out_date: d(13), night_count: 3, status: 'pending', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 22500000, currency_code: 'XOF', source: 'direct', special_requests: 'Chambre avec vue mer', internal_notes: null, confirmed_at: null, cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-05T15:00:00Z', deleted_at: null },
-  { id: 'bk-012', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-012', created_at: '2026-06-10T10:00:00Z', check_in_date: d(-3), check_out_date: d(1), night_count: 4, status: 'checked_out', total_amount_cents: 72000000, paid_amount_cents: 72000000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: '2026-06-11T08:00:00Z', cancelled_at: null, cancellation_reason: null, updated_at: '2026-07-03T11:00:00Z', deleted_at: null },
+function dAt(daysOffset: number, hours = 10, minutes = 0): string {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+  date.setHours(hours, minutes, 0, 0);
+  return date.toISOString();
+}
+
+function isoDay(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function startOfToday(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function prng(seed: number): () => number {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function roundTo(amount: number, step = 100000): number {
+  return Math.round(amount / step) * step;
+}
+
+const demoCuratedBookings: Booking[] = [
+  { id: 'bk-001', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-001', created_at: dAt(-24, 10), check_in_date: d(-7), check_out_date: d(0), night_count: 7, status: 'checked_in', total_amount_cents: 52500000, paid_amount_cents: 37500000, balance_cents: 15000000, currency_code: 'XOF', source: 'direct', special_requests: 'Chambre calme, étage élevé', internal_notes: null, confirmed_at: dAt(-23, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 14), deleted_at: null },
+  { id: 'bk-002', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-002', created_at: dAt(-16, 14), check_in_date: d(-5), check_out_date: d(0), night_count: 5, status: 'checked_in', total_amount_cents: 55000000, paid_amount_cents: 55000000, balance_cents: 0, currency_code: 'XOF', source: 'booking.com', special_requests: null, internal_notes: 'Client fidèle', confirmed_at: dAt(-15, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-2, 10), deleted_at: null },
+  { id: 'bk-003', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-003', created_at: dAt(-9, 9), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 22500000, paid_amount_cents: 11250000, balance_cents: 11250000, currency_code: 'XOF', source: 'direct', special_requests: 'Arrivée tardive prévue', internal_notes: null, confirmed_at: dAt(-8, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-6, 8), deleted_at: null },
+  { id: 'bk-004', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-004', created_at: dAt(-4, 11), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 54000000, paid_amount_cents: 0, balance_cents: 54000000, currency_code: 'XOF', source: 'agoda', special_requests: null, internal_notes: null, confirmed_at: dAt(-3, 9), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-3, 9), deleted_at: null },
+  { id: 'bk-005', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-005', created_at: dAt(-45, 8), check_in_date: d(-30), check_out_date: d(-27), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-44, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-27, 11), deleted_at: null },
+  { id: 'bk-006', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-006', created_at: dAt(-33, 16), check_in_date: d(-20), check_out_date: d(-17), night_count: 3, status: 'completed', total_amount_cents: 33000000, paid_amount_cents: 33000000, balance_cents: 0, currency_code: 'XOF', source: 'booking.com', special_requests: null, internal_notes: null, confirmed_at: dAt(-32, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-17, 11), deleted_at: null },
+  { id: 'bk-007', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-007', created_at: dAt(-19, 12), check_in_date: d(-10), check_out_date: d(-7), night_count: 3, status: 'completed', total_amount_cents: 22500000, paid_amount_cents: 22500000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-18, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-7, 11), deleted_at: null },
+  { id: 'bk-008', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-004', booking_reference: 'EDN-2026-008', created_at: dAt(-12, 9), check_in_date: d(-1), check_out_date: d(5), night_count: 6, status: 'checked_in', total_amount_cents: 270000000, paid_amount_cents: 135000000, balance_cents: 135000000, currency_code: 'XOF', source: 'direct', special_requests: 'Suite Présidentielle - Client VIP', internal_notes: 'Accueil VIP requis', confirmed_at: dAt(-11, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 9), deleted_at: null },
+  { id: 'bk-009', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-009', created_at: dAt(-58, 10), check_in_date: d(-45), check_out_date: d(-42), night_count: 3, status: 'cancelled', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: null, cancelled_at: dAt(-53, 8), cancellation_reason: 'Changement de plan', updated_at: dAt(-53, 8), deleted_at: null },
+  { id: 'bk-010', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-002', booking_reference: 'EDN-2026-010', created_at: dAt(-2, 8), check_in_date: d(0), check_out_date: d(3), night_count: 3, status: 'confirmed', total_amount_cents: 33000000, paid_amount_cents: 16500000, balance_cents: 16500000, currency_code: 'XOF', source: 'expedia', special_requests: null, internal_notes: null, confirmed_at: dAt(-1, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 8), deleted_at: null },
+  { id: 'bk-011', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-001', booking_reference: 'EDN-2026-011', created_at: dAt(-1, 15), check_in_date: d(10), check_out_date: d(13), night_count: 3, status: 'pending', total_amount_cents: 22500000, paid_amount_cents: 0, balance_cents: 22500000, currency_code: 'XOF', source: 'direct', special_requests: 'Chambre avec vue mer', internal_notes: null, confirmed_at: null, cancelled_at: null, cancellation_reason: null, updated_at: dAt(-1, 15), deleted_at: null },
+  { id: 'bk-012', hotel_id: DEMO_HOTEL_ID, rate_plan_id: 'rp-003', booking_reference: 'EDN-2026-012', created_at: dAt(-14, 10), check_in_date: d(-7), check_out_date: d(-3), night_count: 4, status: 'checked_out', total_amount_cents: 72000000, paid_amount_cents: 72000000, balance_cents: 0, currency_code: 'XOF', source: 'direct', special_requests: null, internal_notes: null, confirmed_at: dAt(-13, 8), cancelled_at: null, cancellation_reason: null, updated_at: dAt(-3, 11), deleted_at: null },
 ];
+
+function makeHistoryBookings(): Booking[] {
+  const rnd = prng(20261007);
+  const out: Booking[] = [];
+  const sources = ['direct', 'booking.com', 'expedia', 'agoda', 'phone', 'walk_in'];
+  const planPool = [
+    { id: 'rp-001', ratio: 1 },
+    { id: 'rp-001', ratio: 1 },
+    { id: 'rp-002', ratio: 1.1 },
+    { id: 'rp-003', ratio: 1.25 },
+    { id: 'rp-004', ratio: 1.6 },
+  ];
+  const typePool = [0, 0, 0, 0, 1, 1, 1, 2, 2, 3];
+  const now = new Date();
+  const today = startOfToday();
+  let seq = 100;
+
+  for (let monthsAgo = 11; monthsAgo >= 0; monthsAgo--) {
+    const monthLastDay = new Date(now.getFullYear(), now.getMonth() - monthsAgo + 1, 0).getDate();
+    const maxDay = monthLastDay;
+    const count = Math.round((7 + rnd() * 3 + (11 - monthsAgo) * 0.6) * 8);
+
+    for (let i = 0; i < count; i++) {
+      const day = 1 + Math.floor(rnd() * maxDay);
+      const ci = new Date(now.getFullYear(), now.getMonth() - monthsAgo, day);
+      const nights = 1 + Math.floor(rnd() * 6);
+      const co = new Date(ci);
+      co.setDate(co.getDate() + nights);
+
+      const typeIdx = typePool[Math.floor(rnd() * typePool.length)];
+      const plan = planPool[Math.floor(rnd() * planPool.length)];
+      const total = roundTo(demoRoomTypes[typeIdx].base_price_cents * nights * plan.ratio);
+
+      const created = new Date(ci);
+      created.setDate(created.getDate() - (2 + Math.floor(rnd() * 40)));
+      if (created.getTime() > today.getTime()) {
+        created.setTime(today.getTime() - Math.floor(rnd() * 4) * 86400000);
+      }
+
+      const roll = rnd();
+      let status: BookingStatus;
+      if (co <= today) status = roll < 0.88 ? 'completed' : roll < 0.96 ? 'cancelled' : 'no_show';
+      else if (ci <= today) status = 'checked_in';
+      else status = roll < 0.7 ? 'confirmed' : 'pending';
+
+      const settled = status === 'completed' || status === 'checked_in';
+      const paidRatio =
+        status === 'cancelled' || status === 'no_show' ? 0
+          : settled ? (rnd() < 0.8 ? 1 : 0.5)
+            : rnd() < 0.6 ? 0.5 : 0;
+      const paid = roundTo(total * paidRatio);
+
+      out.push({
+        id: `bk-${String(seq).padStart(3, '0')}`,
+        hotel_id: DEMO_HOTEL_ID,
+        rate_plan_id: plan.id,
+        booking_reference: `EDN-2026-${seq}`,
+        created_at: created.toISOString(),
+        check_in_date: isoDay(ci),
+        check_out_date: isoDay(co),
+        night_count: nights,
+        status,
+        total_amount_cents: total,
+        paid_amount_cents: paid,
+        balance_cents: total - paid,
+        currency_code: 'XOF',
+        source: sources[Math.floor(rnd() * sources.length)],
+        special_requests: null,
+        internal_notes: null,
+        confirmed_at: status === 'pending' ? null : created.toISOString(),
+        cancelled_at: status === 'cancelled' || status === 'no_show' ? created.toISOString() : null,
+        cancellation_reason: status === 'cancelled' ? 'Annulation client' : status === 'no_show' ? 'Non présenté' : null,
+        updated_at: created.toISOString(),
+        deleted_at: null,
+      });
+      seq++;
+    }
+  }
+  return out;
+}
+
+const demoHistoryBookings = makeHistoryBookings();
+
+export const demoBookings: Booking[] = [...demoCuratedBookings, ...demoHistoryBookings]
+  .sort((a, b) => b.created_at.localeCompare(a.created_at));
+
+function computeRoomStatuses(): RoomStatus[] {
+  const checkedIn = demoBookings.filter(b => b.status === 'checked_in').length;
+  const occupied = Math.max(12, Math.min(14, checkedIn));
+  const statuses: RoomStatus[] = Array.from({ length: 24 }, () => 'available' as RoomStatus);
+  statuses[15] = 'maintenance';
+  statuses[16] = 'cleaning';
+  statuses[10] = 'cleaning';
+  for (const i of [13, 7, 17, 21]) statuses[i] = 'reserved';
+  const occupiedPreference = [0, 6, 12, 18, 1, 7, 13, 19, 2, 8, 14, 20, 3, 9, 15, 21, 4, 10, 16, 22, 5, 11, 17, 23];
+  let placed = 0;
+  for (const i of occupiedPreference) {
+    if (placed >= occupied) break;
+    if (statuses[i] === 'available') {
+      statuses[i] = 'occupied';
+      placed++;
+    }
+  }
+  return statuses;
+}
+
+export const demoRooms: Room[] = makeRooms(computeRoomStatuses());
 
 // ---------------------------------------------------------------------------
 // Payments
 // ---------------------------------------------------------------------------
 
-export const demoPayments: Payment[] = [
-  { id: 'pay-001', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-001', amount_cents: 30000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-001', notes: null, processed_at: '2026-06-15T10:05:00Z', created_at: '2026-06-15T10:00:00Z', updated_at: '2026-06-15T10:05:00Z' },
-  { id: 'pay-002', booking_id: 'bk-002', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-002', amount_cents: 55000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-002', notes: null, processed_at: '2026-06-20T14:35:00Z', created_at: '2026-06-20T14:30:00Z', updated_at: '2026-06-20T14:35:00Z' },
-  { id: 'pay-003', booking_id: 'bk-003', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-003', amount_cents: 11250000, currency_code: 'XOF', method: 'transfer', type: 'deposit', status: 'success', external_reference: 'PAY-2026-003', notes: 'Virement SIVOCOM', processed_at: '2026-06-26T08:30:00Z', created_at: '2026-06-25T09:00:00Z', updated_at: '2026-06-26T08:30:00Z' },
-  { id: 'pay-004', booking_id: 'bk-005', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-004', amount_cents: 22500000, currency_code: 'XOF', method: 'cash', type: 'balance', status: 'success', external_reference: null, notes: null, processed_at: '2026-05-13T10:00:00Z', created_at: '2026-05-13T10:00:00Z', updated_at: '2026-05-13T10:00:00Z' },
-  { id: 'pay-005', booking_id: 'bk-006', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-005', amount_cents: 33000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-005', notes: 'Booking.com commission included', processed_at: '2026-05-20T16:05:00Z', created_at: '2026-05-20T16:00:00Z', updated_at: '2026-05-20T16:05:00Z' },
-  { id: 'pay-006', booking_id: 'bk-007', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-006', amount_cents: 22500000, currency_code: 'XOF', method: 'mobile_money', type: 'deposit', status: 'success', external_reference: 'MTN-MO-2026-007', notes: 'Orange Money', processed_at: '2026-06-02T08:10:00Z', created_at: '2026-06-01T12:00:00Z', updated_at: '2026-06-02T08:10:00Z' },
-  { id: 'pay-007', booking_id: 'bk-008', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-009', amount_cents: 135000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-007', notes: 'VIP - Suite Présidentielle', processed_at: '2026-06-29T08:05:00Z', created_at: '2026-06-28T09:30:00Z', updated_at: '2026-06-29T08:05:00Z' },
-  { id: 'pay-008', booking_id: 'bk-010', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-007', amount_cents: 16500000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'EXP-2026-008', notes: null, processed_at: '2026-07-04T08:10:00Z', created_at: '2026-07-03T08:00:00Z', updated_at: '2026-07-04T08:10:00Z' },
-  { id: 'pay-009', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-001', amount_cents: 7500000, currency_code: 'XOF', method: 'cash', type: 'supplement', status: 'success', external_reference: null, notes: 'Surcharge minibar', processed_at: '2026-07-01T14:00:00Z', created_at: '2026-07-01T14:00:00Z', updated_at: '2026-07-01T14:00:00Z' },
-  { id: 'pay-010', booking_id: 'bk-012', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-008', amount_cents: 72000000, currency_code: 'XOF', method: 'transfer', type: 'balance', status: 'success', external_reference: 'WAT-TRF-2026-010', notes: 'Paiement intégral', processed_at: '2026-07-03T10:00:00Z', created_at: '2026-07-03T10:00:00Z', updated_at: '2026-07-03T10:00:00Z' },
-  { id: 'pay-011', booking_id: 'bk-009', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-010', amount_cents: 10000000, currency_code: 'XOF', method: 'card', type: 'refund', status: 'refunded', external_reference: 'REF-2026-011', notes: 'Remboursement annulation', processed_at: '2026-04-22T08:00:00Z', created_at: '2026-04-22T08:00:00Z', updated_at: '2026-04-22T08:00:00Z' },
-  { id: 'pay-012', booking_id: 'bk-004', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-011', amount_cents: 27000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'pending', external_reference: 'AGD-2026-012', notes: null, processed_at: null, created_at: '2026-07-01T11:00:00Z', updated_at: '2026-07-01T11:00:00Z' },
+const demoCuratedPayments: Payment[] = [
+  { id: 'pay-001', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-001', amount_cents: 30000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-001', notes: null, processed_at: dAt(-24, 10), created_at: dAt(-24, 10), updated_at: dAt(-24, 10) },
+  { id: 'pay-002', booking_id: 'bk-002', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-002', amount_cents: 55000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-002', notes: null, processed_at: dAt(-16, 14), created_at: dAt(-16, 14), updated_at: dAt(-16, 14) },
+  { id: 'pay-003', booking_id: 'bk-003', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-003', amount_cents: 11250000, currency_code: 'XOF', method: 'transfer', type: 'deposit', status: 'success', external_reference: 'PAY-2026-003', notes: 'Virement SIVOCOM', processed_at: dAt(-8, 8), created_at: dAt(-9, 9), updated_at: dAt(-8, 8) },
+  { id: 'pay-004', booking_id: 'bk-005', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-004', amount_cents: 22500000, currency_code: 'XOF', method: 'cash', type: 'balance', status: 'success', external_reference: null, notes: null, processed_at: dAt(-27, 10), created_at: dAt(-27, 10), updated_at: dAt(-27, 10) },
+  { id: 'pay-005', booking_id: 'bk-006', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-005', amount_cents: 33000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-005', notes: 'Booking.com commission included', processed_at: dAt(-33, 16), created_at: dAt(-33, 16), updated_at: dAt(-33, 16) },
+  { id: 'pay-006', booking_id: 'bk-007', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-006', amount_cents: 22500000, currency_code: 'XOF', method: 'mobile_money', type: 'deposit', status: 'success', external_reference: 'MTN-MO-2026-007', notes: 'Orange Money', processed_at: dAt(-18, 8), created_at: dAt(-19, 12), updated_at: dAt(-18, 8) },
+  { id: 'pay-007', booking_id: 'bk-008', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-009', amount_cents: 135000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'PAY-2026-007', notes: 'VIP - Suite Présidentielle', processed_at: dAt(-1, 9), created_at: dAt(-1, 9), updated_at: dAt(-1, 9) },
+  { id: 'pay-008', booking_id: 'bk-010', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-007', amount_cents: 16500000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'success', external_reference: 'EXP-2026-008', notes: null, processed_at: dAt(-2, 8), created_at: dAt(-2, 8), updated_at: dAt(-2, 8) },
+  { id: 'pay-009', booking_id: 'bk-001', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-003', guest_id: 'g-001', amount_cents: 7500000, currency_code: 'XOF', method: 'cash', type: 'supplement', status: 'success', external_reference: null, notes: 'Surcharge minibar', processed_at: dAt(-1, 14), created_at: dAt(-1, 14), updated_at: dAt(-1, 14) },
+  { id: 'pay-010', booking_id: 'bk-012', hotel_id: DEMO_HOTEL_ID, employee_id: 'emp-002', guest_id: 'g-008', amount_cents: 72000000, currency_code: 'XOF', method: 'transfer', type: 'balance', status: 'success', external_reference: 'WAT-TRF-2026-010', notes: 'Paiement intégral', processed_at: dAt(-3, 10), created_at: dAt(-3, 10), updated_at: dAt(-3, 10) },
+  { id: 'pay-011', booking_id: 'bk-009', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-010', amount_cents: 10000000, currency_code: 'XOF', method: 'card', type: 'refund', status: 'refunded', external_reference: 'REF-2026-011', notes: 'Remboursement annulation', processed_at: dAt(-53, 8), created_at: dAt(-53, 8), updated_at: dAt(-53, 8) },
+  { id: 'pay-012', booking_id: 'bk-004', hotel_id: DEMO_HOTEL_ID, employee_id: null, guest_id: 'g-011', amount_cents: 27000000, currency_code: 'XOF', method: 'card', type: 'deposit', status: 'pending', external_reference: 'AGD-2026-012', notes: null, processed_at: null, created_at: dAt(-4, 11), updated_at: dAt(-4, 11) },
 ];
+
+function makeHistoryPayments(bookings: Booking[]): Payment[] {
+  const rnd = prng(7654321);
+  const methodPool: PaymentMethod[] = ['card', 'card', 'card', 'card', 'transfer', 'transfer', 'cash', 'mobile_money'];
+  const employeePool: (string | null)[] = ['emp-002', 'emp-003', null, null];
+  const out: Payment[] = [];
+  let seq = 100;
+
+  for (const b of bookings) {
+    const created = new Date(b.created_at);
+    const checkIn = new Date(`${b.check_in_date}T12:00:00Z`);
+    const mk = (amount: number, type: PaymentType, status: PaymentStatus, at: Date): Payment => {
+      const id = `pay-${String(seq).padStart(3, '0')}`;
+      seq += 1;
+      return {
+        id,
+        booking_id: b.id,
+        hotel_id: DEMO_HOTEL_ID,
+        employee_id: employeePool[Math.floor(rnd() * employeePool.length)],
+        guest_id: null,
+        amount_cents: amount,
+        currency_code: 'XOF',
+        method: methodPool[Math.floor(rnd() * methodPool.length)],
+        type,
+        status,
+        external_reference: status === 'success' ? `PAY-2026-${id.slice(4)}` : null,
+        notes: null,
+        processed_at: at.toISOString(),
+        created_at: at.toISOString(),
+        updated_at: at.toISOString(),
+      };
+    };
+
+    if (b.paid_amount_cents > 0) {
+      const futureStay = checkIn.getTime() > Date.now();
+      if (futureStay) {
+        out.push(mk(b.paid_amount_cents, 'deposit', 'success', created));
+      } else {
+        const deposit = roundTo(b.paid_amount_cents * 0.5);
+        out.push(mk(deposit, 'deposit', 'success', created));
+        const rest = b.paid_amount_cents - deposit;
+        if (rest > 0) out.push(mk(rest, 'balance', 'success', checkIn));
+      }
+    } else if ((b.status === 'confirmed' || b.status === 'pending') && rnd() < 0.15) {
+      out.push(mk(roundTo(b.total_amount_cents * 0.3), 'deposit', 'pending', created));
+    }
+  }
+  return out;
+}
+
+export const demoPayments: Payment[] = [...demoCuratedPayments, ...makeHistoryPayments(demoHistoryBookings)]
+  .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
 // ---------------------------------------------------------------------------
 // Reviews
 // ---------------------------------------------------------------------------
 
 export const demoReviews: Review[] = [
-  { id: 'rev-001', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-001', booking_id: 'bk-005', rating: 5, title: 'Séjour parfait', comment: 'Un hôtel d\'exception. Le personnel est attentionné, les chambres sont immaculées et la vue est à couper le souffle. Je recommande vivement.', stay_date_start: d(-30), stay_date_end: d(-27), platform: 'google', hotel_reply: 'Merci infiniment pour votre fidélité, Monsieur Diallo. Nous avons hâte de vous accueillir à nouveau.', internal_note: null, is_visible: true, is_verified: true, created_at: '2026-05-14T10:00:00Z', updated_at: '2026-05-15T08:00:00Z', deleted_at: null },
-  { id: 'rev-002', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-002', booking_id: 'bk-006', rating: 4, title: 'Très bon séjour', comment: 'Chambre magnifique, petit-déjeuner copieux. Le spa pourrait être un peu plus grand. Mais dans l\'ensemble, une très belle expérience.', stay_date_start: d(-20), stay_date_end: d(-17), platform: 'tripadvisor', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: '2026-05-24T14:00:00Z', updated_at: '2026-05-24T14:00:00Z', deleted_at: null },
-  { id: 'rev-003', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-004', booking_id: 'bk-005', rating: 5, title: 'Service irréprochable', comment: 'Un cadre somptueux, un service impeccable. La cuisine du chef Rachid est extraordinaire. Merci à toute l\'équipe.', stay_date_start: d(-30), stay_date_end: d(-27), platform: 'google', hotel_reply: 'Votre satisfaction est notre plus belle récompense, Monsieur Koné. À bientôt !', internal_note: null, is_visible: true, is_verified: true, created_at: '2026-05-14T16:00:00Z', updated_at: '2026-05-16T08:00:00Z', deleted_at: null },
-  { id: 'rev-004', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-006', booking_id: 'bk-007', rating: 4, title: 'Bon rapport qualité-prix', comment: 'Belle chambre, personnel accueillant. La piscine est un vrai plus. Je reviendrai.', stay_date_start: d(-10), stay_date_end: d(-7), platform: 'booking', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: '2026-06-05T12:00:00Z', updated_at: '2026-06-05T12:00:00Z', deleted_at: null },
-  { id: 'rev-005', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-005', booking_id: 'bk-006', rating: 3, title: 'Correct mais perfectible', comment: 'L\'hôtel est bien, mais le Wi-Fi était instable pendant mon séjour. L\'accueil était chaleureux.', stay_date_start: d(-20), stay_date_end: d(-17), platform: 'tripadvisor', hotel_reply: 'Nous vous remercions pour votre retour et avons pris note de votre remarque concernant le Wi-Fi. Des améliorations sont en cours.', internal_note: 'Problème Wi-Fi signalé - à vérifier avec IT', is_visible: true, is_verified: true, created_at: '2026-05-25T09:00:00Z', updated_at: '2026-05-26T10:00:00Z', deleted_at: null },
-  { id: 'rev-006', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-009', booking_id: null, rating: 5, title: 'Le meilleur hôtel d\'Abidjan', comment: 'Un établissement de classe mondiale. La Suite Présidentielle est somptueuse. Le restaurant propose une cuisine raffinée. Un grand bravo.', stay_date_start: d(-15), stay_date_end: d(-10), platform: 'google', hotel_reply: 'Merci pour ces mots élogieux, Monsieur Touré. Vous faites partie de notre famille depuis 2024.', internal_note: 'Client VIP - Platine', is_visible: true, is_verified: true, created_at: '2026-06-15T18:00:00Z', updated_at: '2026-06-16T08:00:00Z', deleted_at: null },
-  { id: 'rev-007', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-007', booking_id: null, rating: 4, title: 'Séjour agréable', comment: 'Très bel hôtel, personnel souriant. La chambre était propre et spacieuse. Le petit-déjeuner aurait pu être plus varié.', stay_date_start: d(-12), stay_date_end: d(-9), platform: 'google', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: '2026-06-12T11:00:00Z', updated_at: '2026-06-12T11:00:00Z', deleted_at: null },
-  { id: 'rev-008', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-003', booking_id: 'bk-007', rating: 5, title: 'Partenariat excellence', comment: 'Notre entreprise séjourne régulièrement à L\'Éden pour nos voyages d\'affaires. Le service est toujours au top. Merci pour votre professionnalisme.', stay_date_start: d(-10), stay_date_end: d(-7), platform: 'direct', hotel_reply: 'Nous vous remercions de votre confiance renouvelée, Société Ivoirienne de Commerce. Nous sommes fiers de notre partenariat.', internal_note: null, is_visible: true, is_verified: true, created_at: '2026-06-06T14:00:00Z', updated_at: '2026-06-07T08:00:00Z', deleted_at: null },
-];
+  { id: 'rev-001', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-001', booking_id: 'bk-005', rating: 5, title: 'Séjour parfait', comment: 'Un hôtel d\'exception. Le personnel est attentionné, les chambres sont immaculées et la vue est à couper le souffle. Je recommande vivement.', stay_date_start: d(-30), stay_date_end: d(-27), platform: 'google', hotel_reply: 'Merci infiniment pour votre fidélité, Monsieur Diallo. Nous avons hâte de vous accueillir à nouveau.', internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-26, 10), updated_at: dAt(-25, 8), deleted_at: null },
+  { id: 'rev-002', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-002', booking_id: 'bk-006', rating: 4, title: 'Très bon séjour', comment: 'Chambre magnifique, petit-déjeuner copieux. Le spa pourrait être un peu plus grand. Mais dans l\'ensemble, une très belle expérience.', stay_date_start: d(-20), stay_date_end: d(-17), platform: 'tripadvisor', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-16, 14), updated_at: dAt(-16, 14), deleted_at: null },
+  { id: 'rev-003', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-004', booking_id: 'bk-005', rating: 5, title: 'Service irréprochable', comment: 'Un cadre somptueux, un service impeccable. La cuisine du chef Rachid est extraordinaire. Merci à toute l\'équipe.', stay_date_start: d(-30), stay_date_end: d(-27), platform: 'google', hotel_reply: 'Votre satisfaction est notre plus belle récompense, Monsieur Koné. À bientôt !', internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-25, 16), updated_at: dAt(-24, 8), deleted_at: null },
+  { id: 'rev-004', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-006', booking_id: 'bk-007', rating: 4, title: 'Bon rapport qualité-prix', comment: 'Belle chambre, personnel accueillant. La piscine est un vrai plus. Je reviendrai.', stay_date_start: d(-10), stay_date_end: d(-7), platform: 'booking', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-6, 12), updated_at: dAt(-6, 12), deleted_at: null },
+  { id: 'rev-005', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-005', booking_id: 'bk-006', rating: 3, title: 'Correct mais perfectible', comment: 'L\'hôtel est bien, mais le Wi-Fi était instable pendant mon séjour. L\'accueil était chaleureux.', stay_date_start: d(-20), stay_date_end: d(-17), platform: 'tripadvisor', hotel_reply: 'Nous vous remercions pour votre retour et avons pris note de votre remarque concernant le Wi-Fi. Des améliorations sont en cours.', internal_note: 'Problème Wi-Fi signalé - à vérifier avec IT', is_visible: true, is_verified: true, created_at: dAt(-15, 9), updated_at: dAt(-14, 10), deleted_at: null },
+  { id: 'rev-006', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-009', booking_id: null, rating: 5, title: 'Le meilleur hôtel d\'Abidjan', comment: 'Un établissement de classe mondiale. La Suite Présidentielle est somptueuse. Le restaurant propose une cuisine raffinée. Un grand bravo.', stay_date_start: d(-15), stay_date_end: d(-10), platform: 'google', hotel_reply: 'Merci pour ces mots élogieux, Monsieur Touré. Vous faites partie de notre famille depuis 2024.', internal_note: 'Client VIP - Platine', is_visible: true, is_verified: true, created_at: dAt(-9, 18), updated_at: dAt(-8, 8), deleted_at: null },
+  { id: 'rev-007', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-007', booking_id: null, rating: 4, title: 'Séjour agréable', comment: 'Très bel hôtel, personnel souriant. La chambre était propre et spacieuse. Le petit-déjeuner aurait pu être plus varié.', stay_date_start: d(-12), stay_date_end: d(-9), platform: 'google', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-8, 11), updated_at: dAt(-8, 11), deleted_at: null },
+  { id: 'rev-008', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-003', booking_id: 'bk-007', rating: 5, title: 'Partenariat excellence', comment: 'Notre entreprise séjourne régulièrement à L\'Éden pour nos voyages d\'affaires. Le service est toujours au top. Merci pour votre professionnalisme.', stay_date_start: d(-10), stay_date_end: d(-7), platform: 'direct', hotel_reply: 'Nous vous remercions de votre confiance renouvelée, Société Ivoirienne de Commerce. Nous sommes fiers de notre partenariat.', internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-5, 14), updated_at: dAt(-4, 8), deleted_at: null },
+  { id: 'rev-009', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-012', booking_id: null, rating: 4, title: 'Séjour en famille', comment: 'Très bon moment en famille. Les enfants ont adoré la piscine. Le personnel était aux petits soins. Nous reviendrons.', stay_date_start: d(-52), stay_date_end: d(-48), platform: 'booking', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-45, 11), updated_at: dAt(-45, 11), deleted_at: null },
+  { id: 'rev-010', hotel_id: DEMO_HOTEL_ID, guest_id: 'g-006', booking_id: null, rating: 4, title: 'Week-end agréable', comment: 'Belle escapade, chambre confortable et petit-déjeuner délicieux. Un petit bémol sur l\'wifi du hall.', stay_date_start: d(-44), stay_date_end: d(-40), platform: 'google', hotel_reply: null, internal_note: null, is_visible: true, is_verified: true, created_at: dAt(-37, 9), updated_at: dAt(-37, 9), deleted_at: null },
+].sort((a, b) => b.created_at.localeCompare(a.created_at));
 
 // ---------------------------------------------------------------------------
 // Rate Plans
@@ -304,10 +491,10 @@ export const demoServices: Service[] = [
   { id: 'svc-005', hotel_id: DEMO_HOTEL_ID, name: 'Location de véhicule', translations: { en: 'Car Rental' }, description: 'Location de véhicules avec ou sans chauffeur', unit_price_cents: 15000000, pricing_type: 'flat', icon: 'Car', category: 'transport', tax_rate: 18, is_active: true, created_at: '2024-01-01T08:00:00Z', updated_at: '2026-01-01T08:00:00Z', deleted_at: null },
 ];
 
-export const demoServicesWithStats: ServiceWithStats[] = demoServices.map(s => ({
+export const demoServicesWithStats: ServiceWithStats[] = demoServices.map((s, i) => ({
   ...s,
-  active_bookings: Math.floor(Math.random() * 20) + 5,
-  revenue_cents: Math.floor(Math.random() * 10000000) + 1000000,
+  active_bookings: [12, 8, 15, 6, 3][i],
+  revenue_cents: [9500000, 4500000, 6400000, 2000000, 15000000][i],
 }));
 
 // ---------------------------------------------------------------------------
@@ -367,70 +554,112 @@ export const demoNotifications: Notification[] = [
 // Analytics (pre-computed data for charts)
 // ---------------------------------------------------------------------------
 
-export const demoRevenueByMonth: RevenueByPeriod[] = [
-  { period: 'Août 25', revenue_cents: 12500000, booking_count: 7 },
-  { period: 'Sep 25', revenue_cents: 14200000, booking_count: 8 },
-  { period: 'Oct 25', revenue_cents: 16800000, booking_count: 9 },
-  { period: 'Nov 25', revenue_cents: 19500000, booking_count: 10 },
-  { period: 'Déc 25', revenue_cents: 28000000, booking_count: 14 },
-  { period: 'Jan 26', revenue_cents: 22000000, booking_count: 11 },
-  { period: 'Fév 26', revenue_cents: 18500000, booking_count: 9 },
-  { period: 'Mar 26', revenue_cents: 20000000, booking_count: 10 },
-  { period: 'Avr 26', revenue_cents: 17200000, booking_count: 8 },
-  { period: 'Mai 26', revenue_cents: 21500000, booking_count: 11 },
-  { period: 'Jun 26', revenue_cents: 24000000, booking_count: 12 },
-  { period: 'Jul 26', revenue_cents: 26500000, booking_count: 13 },
-];
+const demoSuccessPayments = demoPayments.filter(p => p.status === 'success');
 
-export const demoRevenueByDay: RevenueByPeriod[] = Array.from({ length: 30 }, (_, i) => ({
-  period: `${i + 1}`,
-  revenue_cents: Math.round(600000 + Math.random() * 400000),
-  booking_count: Math.floor(Math.random() * 3) + 1,
-}));
+export const demoTotalRevenue: number = demoSuccessPayments.reduce((sum, p) => sum + p.amount_cents, 0);
 
-export const demoPaymentMethods: PaymentMethodBreakdown[] = [
-  { method: 'card', total_cents: 98000000, count: 45 },
-  { method: 'transfer', total_cents: 42000000, count: 12 },
-  { method: 'cash', total_cents: 25000000, count: 18 },
-  { method: 'mobile_money', total_cents: 15000000, count: 8 },
-];
+export const demoRevenueByMonth: RevenueByPeriod[] = (() => {
+  const since = new Date();
+  since.setMonth(since.getMonth() - 12);
+  const monthly: Record<string, RevenueByPeriod> = {};
+  const ordered = [...demoSuccessPayments].sort((a, b) => a.created_at.localeCompare(b.created_at));
+  for (const p of ordered) {
+    if (new Date(p.created_at) < since) continue;
+    const m = new Date(p.created_at).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+    if (!monthly[m]) monthly[m] = { period: m, revenue_cents: 0, booking_count: 0 };
+    monthly[m].revenue_cents += p.amount_cents;
+    monthly[m].booking_count += 1;
+  }
+  return Object.values(monthly);
+})();
 
-export const demoOccupancyByRoomType: OccupancyByRoomType[] = [
-  { room_type: 'Classique', total: 10, occupied: 8, rate: 82 },
-  { room_type: 'Supérieure', total: 6, occupied: 4, rate: 75 },
-  { room_type: 'Suite Junior', total: 3, occupied: 2, rate: 67 },
-  { room_type: 'Suite Prestige', total: 2, occupied: 1, rate: 50 },
-  { room_type: 'Villa', total: 2, occupied: 2, rate: 100 },
-  { room_type: 'Bungalow', total: 2, occupied: 1, rate: 50 },
-];
+export const demoRevenueByDay: RevenueByPeriod[] = (() => {
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const daily: Record<string, RevenueByPeriod> = {};
+  const ordered = [...demoSuccessPayments].sort((a, b) => a.created_at.localeCompare(b.created_at));
+  for (const p of ordered) {
+    if (new Date(p.created_at) < since) continue;
+    const day = new Date(p.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    if (!daily[day]) daily[day] = { period: day, revenue_cents: 0, booking_count: 0 };
+    daily[day].revenue_cents += p.amount_cents;
+    daily[day].booking_count += 1;
+  }
+  return Object.values(daily);
+})();
 
-export const demoBookingStatusDist: BookingStatusDistribution[] = [
-  { status: 'confirmed', count: 18 },
-  { status: 'checked_in', count: 12 },
-  { status: 'pending', count: 6 },
-  { status: 'completed', count: 42 },
-  { status: 'cancelled', count: 8 },
-];
+export const demoPaymentMethods: PaymentMethodBreakdown[] = (() => {
+  const grouped: Record<string, PaymentMethodBreakdown> = {};
+  for (const p of demoSuccessPayments) {
+    const m = p.method || 'other';
+    if (!grouped[m]) grouped[m] = { method: m, total_cents: 0, count: 0 };
+    grouped[m].total_cents += p.amount_cents;
+    grouped[m].count += 1;
+  }
+  return Object.values(grouped);
+})();
+
+export const demoOccupancyByRoomType: OccupancyByRoomType[] = (() => {
+  const grouped: Record<string, { total: number; occupied: number }> = {};
+  for (const r of demoRooms) {
+    const name = demoRoomTypes.find(t => t.id === r.room_type_id)?.name ?? 'Inconnu';
+    if (!grouped[name]) grouped[name] = { total: 0, occupied: 0 };
+    grouped[name].total += 1;
+    if (r.status === 'occupied' || r.status === 'cleaning') grouped[name].occupied += 1;
+  }
+  return Object.entries(grouped).map(([room_type, v]) => ({
+    room_type,
+    total: v.total,
+    occupied: v.occupied,
+    rate: v.total > 0 ? Math.round((v.occupied / v.total) * 100) : 0,
+  }));
+})();
+
+export const demoBookingStatusDist: BookingStatusDistribution[] = (() => {
+  const grouped: Record<string, number> = {};
+  for (const b of demoBookings) grouped[b.status] = (grouped[b.status] ?? 0) + 1;
+  return Object.entries(grouped).map(([status, count]) => ({ status, count }));
+})();
+
+export const demoCancellationRate: number = (() => {
+  const total = demoBookings.length;
+  if (total === 0) return 0;
+  const cancelled = demoBookings.filter(b => b.status === 'cancelled' || b.status === 'no_show').length;
+  return Math.round((cancelled / total) * 100);
+})();
+
+export const demoAvgStay: number = (() => {
+  const stays = demoBookings.filter(b => b.check_in_date && b.check_out_date);
+  if (stays.length === 0) return 0;
+  const totalDays = stays.reduce((sum, b) => {
+    const ci = new Date(b.check_in_date).getTime();
+    const co = new Date(b.check_out_date).getTime();
+    return sum + Math.max(0, (co - ci) / (1000 * 60 * 60 * 24));
+  }, 0);
+  return Math.round((totalDays / stays.length) * 10) / 10;
+})();
 
 // ---------------------------------------------------------------------------
 // Operations Summary
 // ---------------------------------------------------------------------------
 
+const demoTodayIso = isoDay(startOfToday());
+
 export const demoOperationsSummary: OperationsSummary = {
-  arrivalsToday: 4,
-  departuresToday: 3,
-  toClean: 3,
-  inMaintenance: 1,
-  pendingPayments: 2,
-  activeBookings: 14,
-  overdueArrivals: 1,
-  overdueDepartures: 0,
-  totalRooms: 24,
-  occupiedRooms: 14,
+  arrivalsToday: demoBookings.filter(b => b.status === 'confirmed' && b.check_in_date === demoTodayIso).length,
+  departuresToday: demoBookings.filter(b => b.status === 'checked_in' && b.check_out_date === demoTodayIso).length,
+  toClean: demoRooms.filter(r => r.status === 'cleaning').length,
+  inMaintenance: demoRooms.filter(r => r.status === 'maintenance').length,
+  pendingPayments: demoPayments.filter(p => p.status === 'pending').length,
+  activeBookings: demoBookings.filter(b => !['completed', 'cancelled', 'no_show', 'expired'].includes(b.status)).length,
+  overdueArrivals: demoBookings.filter(b => b.status === 'confirmed' && b.check_in_date < demoTodayIso).length,
+  overdueDepartures: demoBookings.filter(b => b.status === 'checked_in' && b.check_out_date < demoTodayIso).length,
+  totalRooms: demoRooms.length,
+  occupiedRooms: demoRooms.filter(r => r.status === 'occupied').length,
   tasks: [
-    { id: 'task-001', type: 'check_in', title: 'Arrivée EDN-2026-003', subtitle: 'Chambre 303 — Demain', priority: 'high', href: '/bookings', booking_id: 'bk-003', room_number: '303' },
+    { id: 'task-001', type: 'check_in', title: 'Arrivée EDN-2026-003', subtitle: 'Chambre 303 — Aujourd\'hui 14h', priority: 'high', href: '/bookings', booking_id: 'bk-003', room_number: '303' },
     { id: 'task-002', type: 'cleaning', title: 'Nettoyage Chambre 402', subtitle: 'Check-out effectué', priority: 'high', href: '/housekeeping', room_number: '402' },
-    { id: 'task-003', type: 'payment_pending', title: 'Paiement en attente', subtitle: 'EDN-2026-004 — 27 000 000 XOF', priority: 'high', href: '/payments', booking_id: 'bk-004' },
+    { id: 'task-003', type: 'payment_pending', title: 'Paiement en attente', subtitle: 'EDN-2026-004 — 270 000 FCFA', priority: 'high', href: '/payments', booking_id: 'bk-004' },
     { id: 'task-004', type: 'maintenance', title: 'Maintenance Climatisation', subtitle: 'Chambre 401 — Rapporté par Adjoua', priority: 'medium', href: '/housekeeping', room_number: '401' },
     { id: 'task-005', type: 'room_unassigned', title: 'Chambre non assignée', subtitle: 'Réservation EDN-2026-011', priority: 'medium', href: '/bookings', booking_id: 'bk-011' },
   ],

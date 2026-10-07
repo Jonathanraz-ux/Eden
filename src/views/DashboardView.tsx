@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, MoreHorizontal } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StarRating } from '../components/StarRating';
 import { BOOKING_STATUS_LABELS as statusLabels } from '../lib/constants';
@@ -17,9 +17,16 @@ import { useRooms } from '../lib/hooks/useRooms';
 import { useCurrentHotelId } from '../lib/hooks/useAuth';
 
 function formatCents(cents: number): string {
-  const euros = cents / 100;
-  if (euros >= 1000) return `${(euros / 1000).toFixed(1)}k €`;
-  return `${euros.toFixed(0)} €`;
+  const value = cents / 100;
+  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M FCFA`;
+  if (value >= 10000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}k FCFA`;
+  return `${value.toLocaleString('fr-FR')} FCFA`;
+}
+
+function formatAxisValue(value: number): string {
+  if (value >= 1000000) return `${(value / 1000000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}M`;
+  if (value >= 1000) return `${(value / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 0 })}k`;
+  return value.toLocaleString('fr-FR');
 }
 
 function formatDate(dateStr: string) {
@@ -47,62 +54,79 @@ export function DashboardView() {
   const loading = loadingBookings || loadingPayments || loadingReviews || loadingRooms;
 
   const now = useMemo(() => new Date(), []);
-  const monthStart = useMemo(() => new Date(now.getFullYear(), now.getMonth(), 1), [now]);
-  const prevMonthStart = useMemo(() => new Date(now.getFullYear(), now.getMonth() - 1, 1), [now]);
-  const prevMonthEnd = useMemo(() => new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59), [now]);
+  const windowStart = useMemo(() => new Date(now.getTime() - 30 * 86400000), [now]);
+  const prevWindowStart = useMemo(() => new Date(now.getTime() - 60 * 86400000), [now]);
 
   const stats = useMemo(() => {
     if (!bookings || !payments || !reviews || !rooms) return null;
 
-    const activeBookings = bookings.filter(b =>
-      !['completed', 'cancelled', 'no_show', 'expired'].includes(b.status)
-    );
+    const isInactive = (s: string) => ['completed', 'cancelled', 'no_show', 'expired'].includes(s);
+    const inWindow = (dateStr: string, from: Date, to: Date) => {
+      const t = new Date(dateStr).getTime();
+      return t >= from.getTime() && t < to.getTime();
+    };
+    const pctChange = (cur: number, prev: number) =>
+      prev > 0 ? Math.round(((cur - prev) / prev) * 100) : cur > 0 ? 100 : 0;
+
+    const activeBookings = bookings.filter(b => !isInactive(b.status));
     const totalRevenue = payments
       .filter(p => p.status === 'success')
       .reduce((sum, p) => sum + p.amount_cents, 0);
-    const occupiedRooms = rooms.filter(r => r.status === 'occupied').length;
+    const occupiedRooms = rooms.filter(r => r.status === 'occupied' || r.status === 'cleaning').length;
     const occupancyRate = rooms.length > 0 ? Math.round((occupiedRooms / rooms.length) * 100) : 0;
     const avgRating = reviews.length > 0
       ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
       : '—';
 
-    const thisMonthRevenue = payments
-      .filter(p => p.status === 'success' && new Date(p.created_at) >= monthStart)
-      .reduce((sum, p) => sum + p.amount_cents, 0);
-    const lastMonthRevenue = payments
-      .filter(p => p.status === 'success' && new Date(p.created_at) >= prevMonthStart && new Date(p.created_at) < monthStart)
-      .reduce((sum, p) => sum + p.amount_cents, 0);
-    const revenueTrend = lastMonthRevenue > 0
-      ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
-      : thisMonthRevenue > 0 ? 100 : 0;
+    const revenueIn = (from: Date, to: Date) =>
+      payments
+        .filter(p => p.status === 'success' && inWindow(p.created_at, from, to))
+        .reduce((sum, p) => sum + p.amount_cents, 0);
+    const revenueTrend = pctChange(revenueIn(windowStart, now), revenueIn(prevWindowStart, windowStart));
 
-    const thisMonthBookings = bookings.filter(b => new Date(b.created_at) >= monthStart).length;
-    const lastMonthBookings = bookings.filter(b => new Date(b.created_at) >= prevMonthStart && new Date(b.created_at) < monthStart).length;
-    const bookingsTrend = lastMonthBookings > 0
-      ? Math.round(((thisMonthBookings - lastMonthBookings) / lastMonthBookings) * 100)
-      : thisMonthBookings > 0 ? 100 : 0;
+    const isoLocal = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const arrivalsIn = (fromIso: string, toIso: string) => {
+      return bookings.filter(b =>
+        b.check_in_date > fromIso && b.check_in_date <= toIso &&
+        !['cancelled', 'no_show', 'expired'].includes(b.status)
+      ).length;
+    };
+    const bookingsTrend = pctChange(
+      arrivalsIn(isoLocal(windowStart), isoLocal(now)),
+      arrivalsIn(isoLocal(prevWindowStart), isoLocal(windowStart))
+    );
 
-    const thisMonthRevenuePerRoom = payments
-      .filter(p => p.status === 'success' && new Date(p.created_at) >= monthStart)
-      .reduce((sum, p) => sum + p.amount_cents, 0);
-    const lastMonthRevenuePerRoom = payments
-      .filter(p => p.status === 'success' && new Date(p.created_at) >= prevMonthStart && new Date(p.created_at) < monthStart)
-      .reduce((sum, p) => sum + p.amount_cents, 0);
-    const occupancyTrend = lastMonthRevenuePerRoom > 0
-      ? Math.round(((thisMonthRevenuePerRoom - lastMonthRevenuePerRoom) / lastMonthRevenuePerRoom) * 100)
-      : thisMonthRevenuePerRoom > 0 ? 100 : 0;
+    const soldNightsRate = (from: Date, to: Date) => {
+      const days = Math.max(1, Math.round((to.getTime() - from.getTime()) / 86400000));
+      let nights = 0;
+      for (const b of bookings) {
+        if (isInactive(b.status)) continue;
+        const ci = new Date(`${b.check_in_date}T00:00:00`).getTime();
+        const co = new Date(`${b.check_out_date}T00:00:00`).getTime();
+        const start = Math.max(ci, from.getTime());
+        const end = Math.min(co, to.getTime());
+        if (end > start) nights += Math.round((end - start) / 86400000);
+      }
+      return rooms.length > 0 ? (nights / (rooms.length * days)) * 100 : 0;
+    };
+    const occupancyTrend = pctChange(
+      soldNightsRate(windowStart, now),
+      soldNightsRate(prevWindowStart, windowStart)
+    );
 
-    const thisMonthReviews = reviews.filter(r => new Date(r.created_at) >= monthStart);
-    const lastMonthReviews = reviews.filter(r => new Date(r.created_at) >= prevMonthStart && new Date(r.created_at) < monthStart);
-    const thisMonthAvg = thisMonthReviews.length > 0
-      ? thisMonthReviews.reduce((sum, r) => sum + r.rating, 0) / thisMonthReviews.length
+    const reviewsIn = (from: Date, to: Date) => reviews.filter(r => inWindow(r.created_at, from, to));
+    const thisWindowReviews = reviewsIn(windowStart, now);
+    const prevWindowReviews = reviewsIn(prevWindowStart, windowStart);
+    const thisWindowAvg = thisWindowReviews.length > 0
+      ? thisWindowReviews.reduce((sum, r) => sum + r.rating, 0) / thisWindowReviews.length
       : 0;
-    const lastMonthAvg = lastMonthReviews.length > 0
-      ? lastMonthReviews.reduce((sum, r) => sum + r.rating, 0) / lastMonthReviews.length
+    const prevWindowAvg = prevWindowReviews.length > 0
+      ? prevWindowReviews.reduce((sum, r) => sum + r.rating, 0) / prevWindowReviews.length
       : 0;
-    const ratingTrend = lastMonthAvg > 0
-      ? Math.round((thisMonthAvg - lastMonthAvg) * 10)
-      : thisMonthAvg > 0 ? 5 : 0;
+    const ratingTrend = prevWindowAvg > 0
+      ? Math.round((thisWindowAvg - prevWindowAvg) * 10)
+      : thisWindowAvg > 0 ? 5 : 0;
 
     return {
       revenue: totalRevenue,
@@ -114,18 +138,25 @@ export function DashboardView() {
       occupancyTrend,
       ratingTrend,
     };
-  }, [bookings, payments, reviews, rooms, monthStart, prevMonthStart]);
+  }, [bookings, payments, reviews, rooms, windowStart, prevWindowStart, now]);
 
   const revenueChart = useMemo(() => {
     if (!payments) return [];
-    const monthly: Record<string, number> = {};
+    const monthly: Record<string, { ts: number; value: number }> = {};
     payments
       .filter(p => p.status === 'success')
       .forEach(p => {
-        const month = new Date(p.created_at).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
-        monthly[month] = (monthly[month] ?? 0) + p.amount_cents;
+        const date = new Date(p.created_at);
+        const key = `${date.getFullYear()}-${date.getMonth()}`;
+        if (!monthly[key]) monthly[key] = { ts: date.getTime(), value: 0 };
+        monthly[key].value += p.amount_cents;
       });
-    return Object.entries(monthly).map(([name, value]) => ({ name, revenu: Math.round(value / 100) }));
+    return Object.keys(monthly)
+      .sort()
+      .map(key => ({
+        name: new Date(monthly[key].ts).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }),
+        revenu: Math.round(monthly[key].value / 100),
+      }));
   }, [payments]);
 
   const recentBookings = useMemo(() => {
@@ -190,10 +221,10 @@ export function DashboardView() {
   }
 
   const kpiItems = stats ? [
-    { label: 'Revenu Total', value: formatCents(stats.revenue), trend: stats.revenueTrend },
-    { label: 'Réservations Actives', value: String(stats.activeBookings), trend: stats.bookingsTrend },
-    { label: "Taux d'Occupation", value: `${stats.occupancy}%`, trend: stats.occupancyTrend },
-    { label: 'Note Moyenne', value: String(stats.rating), trend: stats.ratingTrend },
+    { label: 'Revenu Total', value: formatCents(stats.revenue), trend: stats.revenueTrend, unit: '%' },
+    { label: 'Réservations Actives', value: String(stats.activeBookings), trend: stats.bookingsTrend, unit: '%' },
+    { label: "Taux d'Occupation", value: `${stats.occupancy}%`, trend: stats.occupancyTrend, unit: '%' },
+    { label: 'Note Moyenne', value: String(stats.rating), trend: stats.ratingTrend, unit: 'pt' },
   ] : [];
 
   return (
@@ -217,7 +248,9 @@ export function DashboardView() {
               </CardTitle>
               {stat.trend > 0
                 ? <TrendingUp className={cn("w-4 h-4", i === 3 ? "text-white/60" : "text-emerald-500")} />
-                : <TrendingDown className={cn("w-4 h-4", i === 3 ? "text-white/60" : "text-red-400")} />
+                : stat.trend < 0
+                  ? <TrendingDown className={cn("w-4 h-4", i === 3 ? "text-white/60" : "text-red-400")} />
+                  : <Minus className={cn("w-4 h-4", i === 3 ? "text-white/60" : "text-muted-foreground")} />
               }
             </CardHeader>
             <CardContent>
@@ -230,10 +263,14 @@ export function DashboardView() {
               <p className={cn(
                 "text-[10px] mt-2 font-medium",
                 i === 3 ? "text-white/60" : (
-                  stat.trend > 0 ? "text-emerald-600" : "text-red-500"
+                  stat.trend > 0 ? "text-emerald-600" : stat.trend < 0 ? "text-red-500" : "text-muted-foreground"
                 )
               )}>
-                {stat.trend > 0 ? '+' : ''}{stat.trend}% vs mois dernier
+                {stat.trend === 0
+                  ? 'Stable vs 30 j précédents'
+                  : `${stat.trend > 0 ? '+' : ''}${stat.unit === 'pt'
+                    ? `${(stat.trend / 10).toFixed(1)} pt`
+                    : `${stat.trend}%`} vs 30 j précédents`}
               </p>
             </CardContent>
           </Card>
@@ -274,7 +311,7 @@ export function DashboardView() {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#1A1A1A', opacity: 0.35, fontSize: 10 }}
-                    tickFormatter={(v: number) => `${v}€`}
+                    tickFormatter={(v: number) => formatAxisValue(v)}
                     dx={-5}
                   />
                   <Tooltip
@@ -286,7 +323,7 @@ export function DashboardView() {
                     }}
                     labelStyle={{ color: '#FAF9F6', opacity: 0.6, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em' }}
                     itemStyle={{ color: '#C5A059', fontWeight: 600, fontSize: '13px' }}
-                    formatter={(value: number) => [`${value} €`, 'Revenu']}
+                    formatter={(value: number) => [`${value.toLocaleString('fr-FR')} FCFA`, 'Revenu']}
                   />
                   <Area type="monotone" dataKey="revenu" stroke="#C5A059" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenu)" />
                 </AreaChart>
