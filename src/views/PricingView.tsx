@@ -13,9 +13,15 @@ type Tab = 'rate_plans' | 'seasons';
 
 const PRICING_MODE_LABELS: Record<string, string> = {
   percentage: '%',
+<<<<<<< HEAD
   fixed_amount: 'Ar fixe',
   fixed_price: 'Prix fixe',
   per_night: 'Ar/nuit',
+=======
+  fixed_amount: '€ fixe',
+  fixed_price: 'Prix fixe',
+  per_night: '€/nuit',
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
   weekend_price: 'Week-end',
   event_price: 'Événement',
 };
@@ -213,7 +219,11 @@ export function PricingView() {
                         <div className="flex flex-wrap gap-3 mt-2 text-[10px] text-[#1A1A1A]/40">
                           <span>{season.start_date} → {season.end_date}</span>
                           <span className="font-medium text-[#C5A059]">
+<<<<<<< HEAD
                             {season.pricing_mode === 'percentage' ? `${season.value}%` : formatCents(season.value)}
+=======
+                            {season.pricing_mode === 'percentage' ? `${season.value}%` : `${(season.value / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`}
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
                             <span className="text-[#1A1A1A]/30 ml-0.5">{PRICING_MODE_LABELS[season.pricing_mode]}</span>
                           </span>
                         </div>

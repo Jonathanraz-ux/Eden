@@ -10,6 +10,14 @@
 
 -- Permet aux utilisateurs authentifiés de voir l'hôtel par défaut
 -- (nécessaire pour l'auto-enregistrement employé)
+<<<<<<< HEAD
+=======
+--
+-- ⚠️ OBSOLÈTE —supersédé par 075_tenant_isolation.sql.
+-- L'auto-enregistrement des employés a été supprimé du frontend : la clause
+-- « id = '00000000-...-0001' » ci-dessous est donc une fuite inter-clients.
+-- 075 recrée hotels_select sans elle. Ne pas restaurer cette clause.
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 DROP POLICY IF EXISTS hotels_select ON hotels;
 CREATE POLICY hotels_select ON hotels FOR SELECT
     USING (

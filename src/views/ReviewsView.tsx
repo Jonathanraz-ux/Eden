@@ -1,5 +1,9 @@
 import { useState, useMemo } from 'react';
+<<<<<<< HEAD
 import { cn } from '../lib/utils';
+=======
+import { cn, getGuestDisplayName } from '../lib/utils';
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 import { Skeleton } from '../components/Skeleton';
 import { StarRating } from '../components/StarRating';
 import { Reply, TrendingUp, Eye, EyeOff, Send, Trash2 } from 'lucide-react';
@@ -138,7 +142,11 @@ export function ReviewsView() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {reviews.map((review) => {
               const guest = (review as any).guest as { first_name?: string; last_name?: string } | undefined;
+<<<<<<< HEAD
               const guestName = guest ? `${guest.first_name ?? ''} ${guest.last_name ?? ''}`.trim() : 'Client';
+=======
+              const guestName = guest ? getGuestDisplayName(guest) : 'Client';
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
               const hasReply = Boolean(review.hotel_reply);
               const replyText = replyInputs[review.id] ?? '';
               const isReplying = submitting[review.id];

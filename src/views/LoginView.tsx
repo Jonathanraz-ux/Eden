@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from 'react';
+<<<<<<< HEAD
 import { useNavigate, Link } from 'react-router-dom';
+=======
+import { useNavigate } from 'react-router-dom';
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 import { Hotel, Eye, EyeOff } from 'lucide-react';
 import { useLogin } from '../lib/hooks/useAuth';
 
@@ -119,6 +123,7 @@ export function LoginView() {
               {login.isPending ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
+<<<<<<< HEAD
 
           <div className="mt-8 text-center">
             <div className="relative mb-6">
@@ -143,6 +148,8 @@ export function LoginView() {
               Explorez le dashboard sans compte ni mot de passe
             </p>
           </div>
+=======
+>>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
         </div>
       </div>
     </div>
