@@ -4,11 +4,7 @@ import { useArrivals, useInHouse, useDepartures, useUpdateBookingStatus, useAddB
 import { useRooms, useUpdateRoomStatus } from '../lib/hooks/useRooms';
 import { CheckInModal } from '../components/CheckInModal';
 import { CheckOutModal } from '../components/CheckOutModal';
-<<<<<<< HEAD
-import { cn, formatCents } from '../lib/utils';
-=======
 import { cn, formatCents, getGuestDisplayName } from '../lib/utils';
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 import { BOOKING_STATUS_COLORS, BOOKING_STATUS_LABELS } from '../lib/constants';
 import { User, LogIn, LogOut, Building2, CalendarDays, Clock, BedDouble, ArrowRight, Search, Check, Loader2 } from 'lucide-react';
 import { triggerToast } from '../components/Toast';
@@ -18,11 +14,7 @@ type Tab = 'arrivals' | 'in_house' | 'departures';
 
 function getPrimaryGuest(b: BookingWithRelations): string {
   const g = b.booking_guests?.[0]?.guest;
-<<<<<<< HEAD
-  if (g?.first_name && g?.last_name) return `${g.first_name} ${g.last_name}`;
-=======
   if (g?.first_name || g?.last_name) return getGuestDisplayName(g);
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
   if (g?.first_name) return g.first_name;
   return '—';
 }
@@ -373,3 +365,4 @@ function EmptyState({ icon: Icon, text }: { icon: typeof User; text: string }) {
     </div>
   );
 }
+

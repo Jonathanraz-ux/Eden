@@ -1,9 +1,5 @@
 import { useState, useDeferredValue, useMemo } from 'react';
-<<<<<<< HEAD
-import { cn } from '../lib/utils';
-=======
 import { cn, getGuestDisplayName } from '../lib/utils';
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 import { Search, Plus, Eye, Mail, Phone, Edit, Trash2, Building2, Users, Briefcase, Handshake } from 'lucide-react';
 import { GuestFormModal } from '../components/GuestFormModal';
 import { Skeleton } from '../components/Skeleton';
@@ -149,20 +145,12 @@ export function GuestsView() {
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-[#1A1A1A]/5 flex items-center justify-center text-xs font-serif text-[#1A1A1A]/50 shrink-0">
                             {guest.first_name
-<<<<<<< HEAD
-                              ? `${guest.first_name.charAt(0)}${guest.last_name.charAt(0)}`
-=======
                               ? `${getGuestDisplayName(guest).charAt(0)}${getGuestDisplayName(guest).charAt(1)}`
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
                               : guest.last_name.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
                             <p className="text-sm font-medium text-[#1A1A1A]">
-<<<<<<< HEAD
-                              {guest.first_name ? `${guest.first_name} ${guest.last_name}` : guest.last_name}
-=======
                               {getGuestDisplayName(guest)}
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
                             </p>
                           </div>
                         </div>
@@ -226,3 +214,4 @@ export function GuestsView() {
     </div>
   );
 }
+

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { useCurrentHotelId } from '../lib/hooks/useAuth';
-import { useCreateService, useUpdateService, useDeleteService } from '../lib/hooks/useServices';
+// import { useCreateService, useUpdateService } from '../lib/hooks/useServices';
 import { triggerToast } from './Toast';
 import { cn } from '../lib/utils';
 import type { Service } from '../lib/types/database';

@@ -259,11 +259,7 @@ export function RoomsView() {
                   </div>
 
                   <div className="pt-4 border-t border-[#1A1A1A]/5 flex justify-between items-center mt-auto">
-<<<<<<< HEAD
-                    <span className="text-xl font-serif text-[#C5A059]">{price} Ar<span className="text-[10px] uppercase tracking-widest opacity-40 font-sans ml-1 text-[#1A1A1A]">/nuit</span></span>
-=======
                     <span className="text-xl font-serif text-[#C5A059]">{price}€<span className="text-[10px] uppercase tracking-widest opacity-40 font-sans ml-1 text-[#1A1A1A]">/nuit</span></span>
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
                     <button className="text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest hover:text-[#C5A059] transition-colors">Gérer</button>
                   </div>
                 </div>
@@ -308,11 +304,7 @@ export function RoomsView() {
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-[#1A1A1A]/40 uppercase tracking-wider text-[9px]">Tarif</span>
-<<<<<<< HEAD
-                    <span className="text-base font-serif text-[#1A1A1A]">{price} Ar <span className="text-[9px] uppercase tracking-wider text-[#1A1A1A]/40 font-sans">/nuit</span></span>
-=======
                     <span className="text-base font-serif text-[#1A1A1A]">{price}€ <span className="text-[9px] uppercase tracking-wider text-[#1A1A1A]/40 font-sans">/nuit</span></span>
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
                   </div>
                 </div>
 
@@ -360,3 +352,4 @@ export function RoomsView() {
     </div>
   );
 }
+

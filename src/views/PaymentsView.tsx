@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-<<<<<<< HEAD
 import { Search, Plus, FileText, CreditCard } from 'lucide-react';
 import { cn, formatCents, formatDate } from '../lib/utils';
 import { Skeleton } from '../components/Skeleton';
@@ -7,16 +6,14 @@ import { PaymentFormModal } from '../components/PaymentFormModal';
 import { usePayments, useInvoices, useGenerateInvoiceFromBooking } from '../lib/hooks/usePayments';
 import { useCurrentHotelId } from '../lib/hooks/useAuth';
 import { triggerToast } from '../components/Toast';
-=======
 import { Search, Plus, FileText, CreditCard, Pencil, Trash2 } from 'lucide-react';
 import { cn, formatCents, formatDate } from '../lib/utils';
 import { Skeleton } from '../components/Skeleton';
 import { PaymentFormModal } from '../components/PaymentFormModal';
-import { usePayments, useInvoices, useGenerateInvoiceFromBooking, useDeletePayment, useUpdatePayment } from '../lib/hooks/usePayments';
+import { usePayments, useInvoices, useGenerateInvoiceFromBooking } from '../lib/hooks/usePayments';
 import { useCurrentHotelId } from '../lib/hooks/useAuth';
 import { triggerToast } from '../components/Toast';
 import type { Payment } from '../lib/types/database';
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 
 const methodLabels: Record<string, string> = {
   card: 'Carte',
@@ -57,19 +54,13 @@ export function PaymentsView() {
   const [tab, setTab] = useState<'payments' | 'invoices'>('payments');
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-<<<<<<< HEAD
-=======
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 
   const { data: payments, isLoading: loadingPayments } = usePayments(hotelId ?? '');
   const { data: invoices, isLoading: loadingInvoices } = useInvoices(hotelId ?? '');
   const generateInvoice = useGenerateInvoiceFromBooking();
-<<<<<<< HEAD
-=======
   const deletePayment = useDeletePayment();
   const updatePayment = useUpdatePayment();
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 
   const filteredPayments = useMemo(() => {
     if (!payments) return [];
@@ -98,8 +89,6 @@ export function PaymentsView() {
     }
   };
 
-<<<<<<< HEAD
-=======
   const handleOpenEdit = (payment: Payment) => {
     setEditingPayment(payment);
     setModalOpen(true);
@@ -114,18 +103,14 @@ export function PaymentsView() {
     }
   };
 
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-serif text-[#1A1A1A]">Finances</h1>
           <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/30 mt-1.5 font-medium">
-<<<<<<< HEAD
             {loadingPayments ? 'Chargement...' : `${(totalCollected / 100).toLocaleString('fr-FR')} Ar encaissés`}
-=======
             {loadingPayments ? 'Chargement...' : `${(totalCollected / 100).toLocaleString('fr-FR')} € encaissés`}
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
           </p>
         </div>
         <div className="flex gap-3">
@@ -224,8 +209,6 @@ export function PaymentsView() {
                         </td>
                         <td className="px-6 py-4 text-sm text-[#1A1A1A]/50 max-w-[200px] truncate">{p.notes ?? '—'}</td>
                         <td className="px-6 py-4 text-sm font-serif text-[#1A1A1A] text-right">{formatCents(p.amount_cents)}</td>
-<<<<<<< HEAD
-=======
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
@@ -244,7 +227,6 @@ export function PaymentsView() {
                             </button>
                           </div>
                         </td>
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
                       </tr>
                     ))}
                   </tbody>
@@ -313,16 +295,12 @@ export function PaymentsView() {
 
       <PaymentFormModal
         open={modalOpen}
-<<<<<<< HEAD
-        onClose={() => setModalOpen(false)}
-=======
         onClose={() => {
           setModalOpen(false);
           setEditingPayment(null);
         }}
         preselectedBookingId={editingPayment?.booking_id}
         editingPayment={editingPayment}
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
       />
     </div>
   );

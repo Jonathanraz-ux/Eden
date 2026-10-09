@@ -22,14 +22,10 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-<<<<<<< HEAD
-  }
-=======
   },
   "exclude": [
     "node_modules",
     "dist",
     "supabase/functions"
   ]
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 }

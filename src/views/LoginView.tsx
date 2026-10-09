@@ -1,9 +1,5 @@
 import { useState, type FormEvent } from 'react';
-<<<<<<< HEAD
-import { useNavigate, Link } from 'react-router-dom';
-=======
 import { useNavigate } from 'react-router-dom';
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
 import { Hotel, Eye, EyeOff } from 'lucide-react';
 import { useLogin } from '../lib/hooks/useAuth';
 
@@ -123,35 +119,9 @@ export function LoginView() {
               {login.isPending ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
-<<<<<<< HEAD
-
-          <div className="mt-8 text-center">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#1A1A1A]/10" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-[#FAF9F6] px-4 text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-medium">
-                  ou
-                </span>
-              </div>
-            </div>
-            <Link
-              to="/demo"
-              target="_blank"
-              className="inline-flex items-center gap-2.5 px-6 py-3 border border-[#C5A059]/30 text-[#C5A059] text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#C5A059]/5 transition-colors rounded-sm"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              Voir la démo
-            </Link>
-            <p className="text-[10px] text-[#1A1A1A]/25 mt-3">
-              Explorez le dashboard sans compte ni mot de passe
-            </p>
-          </div>
-=======
->>>>>>> 08b4f88 (Fix demo: guard map operations and handle missing Supabase config; rebuild)
         </div>
       </div>
     </div>
   );
 }
+
